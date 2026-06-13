@@ -11,6 +11,7 @@ import Contact from './components/Contact';
 import HireModal from './components/HireModal';
 import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
+import NotFound from './components/NotFound';
 import './index.css';
 
 function HomePage({ onHireClick }) {
@@ -61,6 +62,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage onHireClick={() => setHireOpen(true)} />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <HireModal open={hireOpen} onClose={() => setHireOpen(false)} />
     </div>
