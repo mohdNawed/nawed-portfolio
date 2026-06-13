@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Navbar({ onHireClick }) {
   const [scrolled, setScrolled] = useState(false);
@@ -20,22 +21,36 @@ export default function Navbar({ onHireClick }) {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   };
 
-  const links = ['Home', 'Projects', 'Services', 'Skills', 'Contact'];
+  const links = [
+    { label: 'Home', href: '/#home' },
+    { label: 'Projects', href: '/#projects' },
+    { label: 'Services', href: '/#services' },
+    { label: 'Skills', href: '/#skills' },
+    { label: 'Contact', href: '/#contact' },
+    { label: 'Dashboard', to: '/dashboard' },
+  ];
 
   return (
     <nav style={navStyle}>
-      <a href="#home" style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--black)', display: 'flex', alignItems: 'center', gap: 8 }}>
+      <a href="/#home" style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--black)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ width: 28, height: 28, background: 'var(--accent)', color: 'white', borderRadius: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800 }}>N</span>
         Nawed
       </a>
 
       <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none', margin: 0, padding: 0 }} className="nav-links-desktop">
-        {links.map(l => (
-          <li key={l}>
-            <a href={`#${l.toLowerCase()}`} style={{ fontSize: '0.875rem', color: 'var(--gray-600)', transition: 'color 0.2s' }}
-              onMouseEnter={e => e.target.style.color = 'var(--text)'}
-              onMouseLeave={e => e.target.style.color = 'var(--gray-600)'}
-            >{l}</a>
+        {links.map(link => (
+          <li key={link.label}>
+            {link.to ? (
+              <Link to={link.to} style={{ fontSize: '0.875rem', color: 'var(--gray-600)', transition: 'color 0.2s' }}
+                onMouseEnter={e => e.target.style.color = 'var(--text)'}
+                onMouseLeave={e => e.target.style.color = 'var(--gray-600)'}
+              >{link.label}</Link>
+            ) : (
+              <a href={link.href} style={{ fontSize: '0.875rem', color: 'var(--gray-600)', transition: 'color 0.2s' }}
+                onMouseEnter={e => e.target.style.color = 'var(--text)'}
+                onMouseLeave={e => e.target.style.color = 'var(--gray-600)'}
+              >{link.label}</a>
+            )}
           </li>
         ))}
       </ul>

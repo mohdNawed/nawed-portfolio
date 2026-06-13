@@ -1,10 +1,48 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const { MongoClient } = require('mongodb');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const mongoUri = process.env.MONGO_URI;
+const dbName = process.env.MONGO_DB_NAME || 'portfolio';
+let db;
+let client;
+
+const connectMongo = async () => {
+  if (!mongoUri) {
+    throw new Error('MONGO_URI is not configured in environment variables.');
+  }
+  client = new MongoClient(mongoUri, {
+    serverApi: '1',
+  });
+  await client.connect();
+  db = client.db(dbName);
+  console.log(`MongoDB connected to database: ${dbName}`);
+};
+
+const startServer = async () => {
+  try {
+    await connectMongo();
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+  } catch (error) {
+    console.error('Failed to start backend:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+process.on('SIGINT', async () => {
+  console.log('Shutting down backend...');
+  if (client) await client.close();
+  process.exit(0);
+});
 
 // Email validation function
 const validateEmail = (email) => {
@@ -52,7 +90,6 @@ app.post('/api/hire', async (req, res) => {
   }
 
   try {
-    // Check environment variables
     const mailUser = process.env.MAIL_USER;
     const mailPass = process.env.MAIL_PASS;
     const recipientEmail = process.env.RECIPIENT_EMAIL;
@@ -69,6 +106,18 @@ app.post('/api/hire', async (req, res) => {
         pass: mailPass,
       },
     });
+
+    const inquiryDocument = {
+      name: sanitizedName,
+      email: sanitizedEmail,
+      projectType: sanitizedProjectType || 'Not specified',
+      budget: sanitizedBudget || 'Not specified',
+      details: sanitizedDetails || 'Not provided',
+      createdAt: new Date(),
+      source: 'hire-form',
+    };
+
+    await db.collection('hireInquiries').insertOne(inquiryDocument);
 
     await transporter.sendMail({
       from: `"${sanitizedName}" <${sanitizedEmail}>`,
@@ -92,7 +141,7 @@ app.post('/api/hire', async (req, res) => {
       `,
     });
 
-    res.json({ success: true, message: 'Email sent successfully!' });
+    res.json({ success: true, message: 'Email sent successfully!', data: inquiryDocument });
   } catch (err) {
     console.error('Hire email error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to send email. Please try again.' });
@@ -143,6 +192,16 @@ app.post('/api/contact', async (req, res) => {
       },
     });
 
+    const messageDocument = {
+      name: sanitizedName,
+      email: sanitizedEmail,
+      message: sanitizedMessage,
+      createdAt: new Date(),
+      source: 'contact-form',
+    };
+
+    await db.collection('contactMessages').insertOne(messageDocument);
+
     await transporter.sendMail({
       from: `"${sanitizedName}" <${sanitizedEmail}>`,
       to: recipientEmail,
@@ -150,10 +209,40 @@ app.post('/api/contact', async (req, res) => {
       html: `<p><b>From:</b> ${sanitizedName} (${sanitizedEmail})</p><p><b>Message:</b> ${sanitizedMessage}</p>`,
     });
 
-    res.json({ success: true, message: 'Message sent!' });
+    res.json({ success: true, message: 'Message sent!', data: messageDocument });
   } catch (err) {
     console.error('Contact email error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to send message.' });
+  }
+});
+
+// GET /api/dashboard/hire — list saved hire inquiries
+app.get('/api/dashboard/hire', async (req, res) => {
+  try {
+    const items = await db
+      .collection('hireInquiries')
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+    res.json({ success: true, data: items });
+  } catch (err) {
+    console.error('Dashboard hire fetch error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to fetch hire inquiries.' });
+  }
+});
+
+// GET /api/dashboard/contact — list saved contact messages
+app.get('/api/dashboard/contact', async (req, res) => {
+  try {
+    const items = await db
+      .collection('contactMessages')
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+    res.json({ success: true, data: items });
+  } catch (err) {
+    console.error('Dashboard contact fetch error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to fetch contact messages.' });
   }
 });
 
@@ -161,6 +250,3 @@ app.post('/api/contact', async (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend is running!' });
 });
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));

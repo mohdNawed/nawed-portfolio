@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Stats from './components/Stats';
@@ -9,15 +10,13 @@ import Certificates from './components/Certificates';
 import Contact from './components/Contact';
 import HireModal from './components/HireModal';
 import Footer from './components/Footer';
+import Dashboard from './components/Dashboard';
 import './index.css';
 
-function App() {
-  const [hireOpen, setHireOpen] = useState(false);
-
+function HomePage({ onHireClick }) {
   return (
-    <div>
-      <Navbar onHireClick={() => setHireOpen(true)} />
-      <Hero onHireClick={() => setHireOpen(true)} />
+    <>
+      <Hero onHireClick={onHireClick} />
       <Stats />
       <Projects />
       <Services />
@@ -36,7 +35,7 @@ function App() {
         <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 480, margin: '0 auto 2rem', lineHeight: 1.75 }}>
           I'm actively looking for freelance work and full-time opportunities. Let's connect!
         </p>
-        <button onClick={() => setHireOpen(true)} style={{
+        <button onClick={onHireClick} style={{
           background: 'white', color: 'var(--black)',
           padding: '0.8rem 2rem', borderRadius: 100,
           fontSize: '0.9rem', fontWeight: 600, border: 'none', cursor: 'pointer',
@@ -47,8 +46,22 @@ function App() {
         >✉ Get in Touch</button>
       </section>
 
-      <Contact onHireClick={() => setHireOpen(true)} />
+      <Contact onHireClick={onHireClick} />
       <Footer />
+    </>
+  );
+}
+
+function App() {
+  const [hireOpen, setHireOpen] = useState(false);
+
+  return (
+    <div>
+      <Navbar onHireClick={() => setHireOpen(true)} />
+      <Routes>
+        <Route path="/" element={<HomePage onHireClick={() => setHireOpen(true)} />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
       <HireModal open={hireOpen} onClose={() => setHireOpen(false)} />
     </div>
   );

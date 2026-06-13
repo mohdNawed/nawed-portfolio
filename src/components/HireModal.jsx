@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config';
 
 export default function HireModal({ open, onClose }) {
   const [form, setForm] = useState({ name: '', email: '', projectType: '', budget: '', details: '' });
@@ -24,7 +25,7 @@ export default function HireModal({ open, onClose }) {
     setErrorMsg('');
     setStatus('loading');
     try {
-      const res = await fetch('http://localhost:5000/api/hire', {
+      const res = await fetch(`${API_BASE_URL}/api/hire`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import API_BASE_URL from '../config';
 
 export default function Contact({ onHireClick }) {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -10,7 +11,7 @@ export default function Contact({ onHireClick }) {
     e.preventDefault();
     setStatus('loading');
     try {
-      const res = await fetch('http://localhost:5000/api/contact', {
+      const res = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
