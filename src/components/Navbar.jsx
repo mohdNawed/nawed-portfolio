@@ -23,6 +23,7 @@ export default function Navbar({ onHireClick }) {
 
   const links = [
     { label: 'Home', href: `${baseUrl}#home` },
+    { label: 'About', href: `${baseUrl}#about` },
     { label: 'Projects', href: `${baseUrl}#projects` },
     { label: 'Services', href: `${baseUrl}#services` },
     { label: 'Skills', href: `${baseUrl}#skills` },

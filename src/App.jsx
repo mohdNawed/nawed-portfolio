@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Stats from './components/Stats';
+import About from './components/About';
 import Projects from './components/Projects';
 import Services from './components/Services';
 import Skills from './components/Skills';
@@ -20,6 +21,7 @@ function HomePage({ onHireClick }) {
     <>
       <Hero onHireClick={onHireClick} />
       <Stats />
+      <About onHireClick={onHireClick} />
       <Projects />
       <Services />
       <Skills />
