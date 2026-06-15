@@ -3,7 +3,7 @@ import { stats } from '../data/projects';
 
 export default function Stats() {
   return (
-    <div style={{
+    <div className="stats-grid" style={{
       maxWidth: 1100, margin: '0 auto 5rem', padding: '0 2rem',
       display: 'grid', gridTemplateColumns: 'repeat(4,1fr)',
       border: '1px solid var(--gray-200)', borderRadius: 'var(--radius)', overflow: 'hidden'

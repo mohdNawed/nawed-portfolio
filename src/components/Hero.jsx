@@ -4,7 +4,7 @@ export default function Hero({ onHireClick }) {
   const baseUrl = import.meta.env.BASE_URL;
 
   return (
-    <section id="home" style={{
+    <section id="home" className="hero-grid" style={{
       maxWidth: 1100, margin: '0 auto',
       padding: '7rem 2rem 4rem',
       display: 'grid', gridTemplateColumns: '1fr 380px',
@@ -12,7 +12,8 @@ export default function Hero({ onHireClick }) {
     }}>
       <style>{`
         @media(max-width:768px){
-          .hero-grid{grid-template-columns:1fr !important; padding-top:5rem !important;}
+          .hero-grid{grid-template-columns:minmax(0,1fr) !important; padding:5rem 1.25rem 3rem !important; gap:2rem !important;}
+          .hero-content,.hero-visual-wrap{min-width:0;}
           .hero-visual-wrap{order:-1;}
           .hero-tag{left:10px !important;}
         }
