@@ -4,8 +4,10 @@ import { certificates } from '../data/projects';
 export default function Certificates() {
   const [hoveredId, setHoveredId] = useState(null);
   const [selectedCert, setSelectedCert] = useState(certificates[0]);
+  const baseUrl = import.meta.env.BASE_URL;
 
   const hasCertificateFile = cert => Boolean(cert.file && cert.uploaded);
+  const certificateUrl = cert => `${baseUrl}${cert.file.replace(/^\//, '')}`;
   const selectedHasFile = hasCertificateFile(selectedCert);
 
   return (
@@ -84,7 +86,7 @@ export default function Certificates() {
               {hasCertificateFile(cert) && (
                 <div style={{ display: 'flex', gap: '0.65rem', marginTop: '1rem', flexWrap: 'wrap' }}>
                   <a
-                    href={cert.file}
+                    href={certificateUrl(cert)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={event => event.stopPropagation()}
@@ -103,7 +105,7 @@ export default function Certificates() {
                     View
                   </a>
                   <a
-                    href={cert.file}
+                    href={certificateUrl(cert)}
                     download
                     onClick={event => event.stopPropagation()}
                     style={{
@@ -144,7 +146,7 @@ export default function Certificates() {
               {selectedHasFile ? (
                 <iframe
                   title={`${selectedCert.title} certificate preview`}
-                  src={selectedCert.file}
+                  src={certificateUrl(selectedCert)}
                   style={{ width: '100%', height: 320, border: 0, borderRadius: 'var(--radius-sm)', background: 'white' }}
                 />
               ) : (
@@ -181,7 +183,7 @@ export default function Certificates() {
               </div>
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <a
-                  href={selectedHasFile ? selectedCert.file : undefined}
+                  href={selectedHasFile ? certificateUrl(selectedCert) : undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-disabled={!selectedHasFile}
@@ -201,7 +203,7 @@ export default function Certificates() {
                   View Certificate
                 </a>
                 <a
-                  href={selectedHasFile ? selectedCert.file : undefined}
+                  href={selectedHasFile ? certificateUrl(selectedCert) : undefined}
                   download
                   aria-disabled={!selectedHasFile}
                   style={{

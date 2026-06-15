@@ -1,6 +1,8 @@
 import React from 'react';
 
 export default function Hero({ onHireClick }) {
+  const baseUrl = import.meta.env.BASE_URL;
+
   return (
     <section id="home" style={{
       maxWidth: 1100, margin: '0 auto',
@@ -53,7 +55,7 @@ export default function Hero({ onHireClick }) {
             onMouseLeave={e => e.currentTarget.style.background = 'var(--black)'}
           >⚡ View Projects</a>
 
-          <a href="/Nawed_Resume.pdf" download style={{
+          <a href={`${baseUrl}Nawed_Resume.pdf`} download style={{
             background: 'transparent', color: 'var(--text)', padding: '0.7rem 1.5rem',
             borderRadius: 100, fontSize: '0.9rem', fontWeight: 500,
             border: '1.5px solid var(--gray-200)', display: 'inline-flex',
@@ -89,7 +91,7 @@ export default function Hero({ onHireClick }) {
           overflow: 'hidden', background: 'var(--gray-100)',
         }}>
           <img
-            src="/profile.jpg"
+            src={`${baseUrl}profile.jpg`}
             alt="Md Nawed Alam - Full Stack Developer"
             loading="eager"
             style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}

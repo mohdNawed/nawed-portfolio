@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function Navbar({ onHireClick }) {
   const [scrolled, setScrolled] = useState(false);
+  const baseUrl = import.meta.env.BASE_URL;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -21,18 +22,18 @@ export default function Navbar({ onHireClick }) {
   };
 
   const links = [
-    { label: 'Home', href: '/#home' },
-    { label: 'Projects', href: '/#projects' },
-    { label: 'Services', href: '/#services' },
-    { label: 'Skills', href: '/#skills' },
-    { label: 'Social', href: '/#social' },
-    { label: 'Contact', href: '/#contact' },
+    { label: 'Home', href: `${baseUrl}#home` },
+    { label: 'Projects', href: `${baseUrl}#projects` },
+    { label: 'Services', href: `${baseUrl}#services` },
+    { label: 'Skills', href: `${baseUrl}#skills` },
+    { label: 'Social', href: `${baseUrl}#social` },
+    { label: 'Contact', href: `${baseUrl}#contact` },
     { label: 'Dashboard', to: '/dashboard' },
   ];
 
   return (
     <nav style={navStyle}>
-      <a href="/#home" style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--black)', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <a href={`${baseUrl}#home`} style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--black)', display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{
           width: 34,
           height: 34,
@@ -43,7 +44,7 @@ export default function Navbar({ onHireClick }) {
           background: 'var(--accent-light)',
           flexShrink: 0
         }}>
-          <img src="/profile.jpg" alt="Md Nawed Alam" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
+          <img src={`${baseUrl}profile.jpg`} alt="Md Nawed Alam" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
         </span>
         Nawed Dev
       </a>
