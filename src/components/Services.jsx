@@ -16,7 +16,7 @@ export default function Services() {
         <div className="section-eyebrow">What I Do</div>
         <div className="section-title">Services &amp; Expertise</div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '1.25rem' }}>
+      <div className="services-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '1.25rem' }}>
         <style>{`@media(max-width:600px){.services-grid{grid-template-columns:1fr!important;}}`}</style>
         {services.map((s, i) => (
           <div key={i}
