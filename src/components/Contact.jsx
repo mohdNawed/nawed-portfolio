@@ -78,6 +78,11 @@ export default function Contact({ onHireClick }) {
               style={{ ...inputStyle, resize: 'vertical', minHeight: 120 }}
               onFocus={e => e.target.style.borderColor = 'var(--accent)'}
               onBlur={e => e.target.style.borderColor = 'var(--gray-200)'} />
+            {status === 'error' && (
+              <p style={{ color: '#e24b4a', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
+                Failed to send your message. Please try again or use the Hire Me form.
+              </p>
+            )}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <button type="submit" disabled={status === 'loading'} style={{
                 flex: 1, padding: '0.8rem', background: 'var(--black)', color: 'white',

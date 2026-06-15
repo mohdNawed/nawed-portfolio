@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { projects } from '../data/projects';
 
-const categories = ['All', 'MERN Stack', 'Full Stack', 'Frontend', 'Backend', 'Next.js', 'React'];
+const categories = ['All', 'Full Stack', 'Frontend', 'Backend', 'React', 'Java', 'Database'];
 
 export default function Projects() {
   const [filter, setFilter] = useState('All');

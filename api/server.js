@@ -18,7 +18,7 @@ const connectMongo = async () => {
   const dbName = process.env.MONGO_DB_NAME || 'portfolio';
 
   if (!mongoUri) {
-    throw new Error('MONGO_URI is not configured.');
+    return null;
   }
 
   client = new MongoClient(mongoUri, { serverApi: '1' });
@@ -27,15 +27,15 @@ const connectMongo = async () => {
   return db;
 };
 
-app.use(async (req, res, next) => {
+const saveDocument = async (collectionName, document) => {
   try {
-    await connectMongo();
-    next();
+    const database = await connectMongo();
+    if (!database) return;
+    await database.collection(collectionName).insertOne(document);
   } catch (error) {
-    console.error('Database connection failed:', error.message);
-    res.status(500).json({ success: false, message: 'Database connection failed.' });
+    console.error(`Could not save ${collectionName}:`, error.message);
   }
-});
+};
 
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -57,6 +57,19 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     service: 'gmail',
     auth: { user: MAIL_USER, pass: MAIL_PASS },
+  });
+};
+
+const sendPortfolioEmail = async ({ replyTo, subject, text, html }) => {
+  const transporter = createTransporter();
+
+  await transporter.sendMail({
+    from: `"Nawed Portfolio" <${process.env.MAIL_USER}>`,
+    replyTo,
+    to: process.env.RECIPIENT_EMAIL,
+    subject,
+    text,
+    html,
   });
 };
 
@@ -88,15 +101,24 @@ app.post('/api/hire', async (req, res) => {
       source: 'hire-form',
     };
 
-    await db.collection('hireInquiries').insertOne(inquiryDocument);
-
-    await createTransporter().sendMail({
-      from: process.env.MAIL_USER,
+    await sendPortfolioEmail({
       replyTo: sanitizedEmail,
-      to: process.env.RECIPIENT_EMAIL,
       subject: `Hire Inquiry from ${sanitizedName}`,
       text: `New inquiry from ${sanitizedName} (${sanitizedEmail}). Project: ${sanitizedProjectType}. Budget: ${sanitizedBudget}. Details: ${sanitizedDetails}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#18181b">
+          <h2>New Hire Inquiry</h2>
+          <p><strong>Name:</strong> ${sanitizedName}</p>
+          <p><strong>Email:</strong> ${sanitizedEmail}</p>
+          <p><strong>Project Type:</strong> ${sanitizedProjectType || 'Not specified'}</p>
+          <p><strong>Budget:</strong> ${sanitizedBudget || 'Not specified'}</p>
+          <p><strong>Details:</strong></p>
+          <p>${sanitizedDetails || 'Not provided'}</p>
+        </div>
+      `,
     });
+
+    await saveDocument('hireInquiries', inquiryDocument);
 
     res.json({ success: true, message: 'Email sent successfully!', data: inquiryDocument });
   } catch (error) {
@@ -129,15 +151,14 @@ app.post('/api/contact', async (req, res) => {
       source: 'contact-form',
     };
 
-    await db.collection('contactMessages').insertOne(messageDocument);
-
-    await createTransporter().sendMail({
-      from: process.env.MAIL_USER,
+    await sendPortfolioEmail({
       replyTo: sanitizedEmail,
-      to: process.env.RECIPIENT_EMAIL,
       subject: `Contact from ${sanitizedName}`,
+      text: `New contact message from ${sanitizedName} (${sanitizedEmail}).\n\n${sanitizedMessage}`,
       html: `<p><b>From:</b> ${sanitizedName} (${sanitizedEmail})</p><p><b>Message:</b> ${sanitizedMessage}</p>`,
     });
+
+    await saveDocument('contactMessages', messageDocument);
 
     res.json({ success: true, message: 'Message sent!', data: messageDocument });
   } catch (error) {
@@ -148,7 +169,9 @@ app.post('/api/contact', async (req, res) => {
 
 app.get('/api/dashboard/hire', async (req, res) => {
   try {
-    const items = await db.collection('hireInquiries').find({}).sort({ createdAt: -1 }).toArray();
+    const database = await connectMongo();
+    if (!database) return res.json({ success: true, data: [] });
+    const items = await database.collection('hireInquiries').find({}).sort({ createdAt: -1 }).toArray();
     res.json({ success: true, data: items });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to fetch hire inquiries.' });
@@ -157,7 +180,9 @@ app.get('/api/dashboard/hire', async (req, res) => {
 
 app.get('/api/dashboard/contact', async (req, res) => {
   try {
-    const items = await db.collection('contactMessages').find({}).sort({ createdAt: -1 }).toArray();
+    const database = await connectMongo();
+    if (!database) return res.json({ success: true, data: [] });
+    const items = await database.collection('contactMessages').find({}).sort({ createdAt: -1 }).toArray();
     res.json({ success: true, data: items });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to fetch contact messages.' });

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 
 export default function Navbar({ onHireClick }) {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -26,15 +25,27 @@ export default function Navbar({ onHireClick }) {
     { label: 'Projects', href: '/#projects' },
     { label: 'Services', href: '/#services' },
     { label: 'Skills', href: '/#skills' },
+    { label: 'Social', href: '/#social' },
     { label: 'Contact', href: '/#contact' },
     { label: 'Dashboard', to: '/dashboard' },
   ];
 
   return (
     <nav style={navStyle}>
-      <a href="/#home" style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--black)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ width: 28, height: 28, background: 'var(--accent)', color: 'white', borderRadius: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800 }}>N</span>
-        Nawed
+      <a href="/#home" style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--black)', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{
+          width: 34,
+          height: 34,
+          borderRadius: '50%',
+          display: 'inline-flex',
+          overflow: 'hidden',
+          border: '2px solid var(--accent)',
+          background: 'var(--accent-light)',
+          flexShrink: 0
+        }}>
+          <img src="/profile.jpg" alt="Md Nawed Alam" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
+        </span>
+        Nawed Dev
       </a>
 
       <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none', margin: 0, padding: 0 }} className="nav-links-desktop">

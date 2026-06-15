@@ -7,6 +7,7 @@ import Projects from './components/Projects';
 import Services from './components/Services';
 import Skills from './components/Skills';
 import Certificates from './components/Certificates';
+import SocialMedia from './components/SocialMedia';
 import Contact from './components/Contact';
 import HireModal from './components/HireModal';
 import Footer from './components/Footer';
@@ -23,6 +24,7 @@ function HomePage({ onHireClick }) {
       <Services />
       <Skills />
       <Certificates />
+      <SocialMedia />
 
       {/* CTA Banner */}
       <section style={{
