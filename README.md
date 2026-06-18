@@ -6,9 +6,8 @@ A full-stack personal portfolio for Md Nawed Alam, Full Stack Developer.
 
 ```
 nawed-portfolio/
-├── backend/              ← Express.js server
-│   ├── server.js         ← API routes (/api/hire, /api/contact)
-│   └── package.json
+├── api/
+│   └── server.js         ← Express API routes and Render/Vercel backend entry
 ├── public/
 │   └── Nawed_Resume.pdf  ← Downloadable CV
 └── src/
@@ -32,18 +31,17 @@ nawed-portfolio/
 ### 1. Frontend
 ```bash
 npm install
-npm start
-# Runs on http://localhost:3000
+npm run dev
+# Runs on http://localhost:5173
 ```
 
 ### 2. Backend
 ```bash
-cd backend
 npm install
 # Set env vars:
 # MAIL_USER=mdalamnawed@gmail.com
 # MAIL_PASS=your_gmail_app_password
-node server.js
+npm start
 # Runs on http://localhost:5000
 ```
 
@@ -60,8 +58,41 @@ node server.js
 | POST | /api/contact | Sends general contact email |
 
 ## Deploy
-- Frontend: Hostinger static site / Vercel / Netlify (`npm run build`)
-- Backend: Hostinger Node hosting / Render / Railway / Fly / Heroku
+- Frontend: Vercel / GitHub Pages / Hostinger static site (`npm run build`)
+- Backend: Vercel serverless API or Render web service
+
+### Vercel frontend and API
+This repository can run the frontend and API together on Vercel.
+
+1. Vercel build command: `npm run build`
+2. Vercel output directory: `build`
+3. Vercel rewrites `/api/*` to `api/server.js`.
+4. Add environment variables in Vercel:
+   - `MAIL_USER`
+   - `MAIL_PASS`
+   - `RECIPIENT_EMAIL`
+   - `MONGO_URI` optional
+   - `MONGO_DB_NAME` optional
+
+### Render backend deployment
+The backend can also run as a normal Node web service on Render using `render.yaml`.
+
+1. Connect this GitHub repository to Render.
+2. Create a new Web Service or Blueprint from `render.yaml`.
+3. Render settings:
+   - Build command: `npm install`
+   - Start command: `npm start`
+   - Health check path: `/api/health`
+4. Add environment variables in Render:
+   - `MAIL_USER`
+   - `MAIL_PASS`
+   - `RECIPIENT_EMAIL`
+   - `MONGO_URI` optional
+   - `MONGO_DB_NAME=portfolio`
+   - `CORS_ORIGIN=https://naweddev.com,https://nawed-portfolio-mohdnaweds-projects.vercel.app`
+5. After Render gives you a backend URL, set this in Vercel:
+   - `VITE_API_BASE_URL=https://your-render-service.onrender.com`
+6. Redeploy Vercel so the frontend sends contact and hire form requests to Render.
 
 ### Hostinger ready deployment
 
@@ -73,8 +104,8 @@ node server.js
    ```
 2. Upload the generated `build/` folder to Hostinger static site hosting.
 3. Deploy backend under Hostinger Node.js hosting:
-   - Upload the `backend/` folder
-   - Run `npm install` in `backend/`
+   - Upload the project files
+   - Run `npm install` in the project root
    - Set the backend start command to `npm start`
 4. Configure backend environment variables in Hostinger:
    - `MONGO_URI`

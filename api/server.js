@@ -5,7 +5,9 @@ const nodemailer = require('nodemailer');
 const { MongoClient } = require('mongodb');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim()) : true,
+}));
 app.use(express.json());
 
 let db;
@@ -190,7 +192,26 @@ app.get('/api/dashboard/contact', async (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'Backend is running on Vercel!' });
+  res.json({
+    status: 'ok',
+    service: 'Nawed Dev backend',
+    platform: process.env.RENDER ? 'render' : 'node',
+  });
 });
+
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Nawed Dev backend is running.',
+    health: '/api/health',
+  });
+});
+
+if (require.main === module) {
+  const port = process.env.PORT || 5000;
+  app.listen(port, () => {
+    console.log(`Nawed Dev backend running on port ${port}`);
+  });
+}
 
 module.exports = app;

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: nawed-dev-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASS
+        sync: false
+      - key: RECIPIENT_EMAIL
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB_NAME
+        value: portfolio
+      - key: CORS_ORIGIN
+        value: https://naweddev.com,https://nawed-portfolio-mohdnaweds-projects.vercel.app
