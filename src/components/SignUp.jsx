@@ -38,7 +38,7 @@ export default function SignUp() {
       if (!response.ok || !data.success) throw new Error(data.message || 'Signup failed.');
 
       saveSession(data.token, data.user);
-      navigate('/dashboard', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.message || 'Could not create account.');
       setStatus('error');
@@ -48,8 +48,8 @@ export default function SignUp() {
   return (
     <AuthLayout
       eyebrow="Create Access"
-      title="Create an account for backend-managed portfolio access."
-      subtitle="The backend stores your account securely and gives dashboard access only after sign in."
+      title="Create your Nawed Dev account."
+      subtitle="The backend stores your account securely and keeps the navbar login/logout state in sync."
     >
       <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 380 }}>
         <div className="section-eyebrow">Sign Up</div>

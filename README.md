@@ -151,6 +151,6 @@ VITE_API_BASE_URL=https://your-backend.example.com
 ## Auth
 - `/signup` creates an account through `POST /api/auth/signup`.
 - `/signin` logs in through `POST /api/auth/signin`.
-- `/dashboard` is protected and requires a valid backend token.
+- The navbar shows Sign In when logged out and Sign Out when logged in.
 - Set `JWT_SECRET` in production.
 - Set `MONGO_URI` in production so users persist across deploys and server restarts. Without MongoDB, auth works only as a temporary local development fallback.

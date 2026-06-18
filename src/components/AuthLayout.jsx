@@ -66,7 +66,7 @@ export default function AuthLayout({ eyebrow, title, subtitle, children }) {
           {[
             ['Secure', 'Token based access'],
             ['Managed', 'Backend auth routes'],
-            ['Private', 'Dashboard protected'],
+            ['Private', 'Session protected'],
           ].map(([label, text]) => (
             <div key={label} style={{
               background: 'rgba(255,255,255,0.75)',

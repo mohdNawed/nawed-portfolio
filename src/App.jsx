@@ -12,11 +12,9 @@ import SocialMedia from './components/SocialMedia';
 import Contact from './components/Contact';
 import HireModal from './components/HireModal';
 import Footer from './components/Footer';
-import Dashboard from './components/Dashboard';
 import NotFound from './components/NotFound';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
-import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
@@ -71,7 +69,6 @@ function App() {
         <Route path="/" element={<HomePage onHireClick={() => setHireOpen(true)} />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <HireModal open={hireOpen} onClose={() => setHireOpen(false)} />

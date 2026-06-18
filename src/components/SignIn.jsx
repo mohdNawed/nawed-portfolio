@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
 import AuthLayout from './AuthLayout';
 import { useAuth } from '../context/AuthContext';
@@ -19,7 +19,6 @@ export default function SignIn() {
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
   const { saveSession } = useAuth();
 
   const handleChange = event => setForm(current => ({ ...current, [event.target.name]: event.target.value }));
@@ -39,7 +38,7 @@ export default function SignIn() {
       if (!response.ok || !data.success) throw new Error(data.message || 'Sign in failed.');
 
       saveSession(data.token, data.user);
-      navigate(location.state?.from?.pathname || '/dashboard', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.message || 'Could not sign in.');
       setStatus('error');
@@ -49,12 +48,12 @@ export default function SignIn() {
   return (
     <AuthLayout
       eyebrow="Welcome Back"
-      title="Sign in to manage your portfolio dashboard."
-      subtitle="Access saved messages, hire inquiries, and private backend-managed data from one secure area."
+      title="Sign in to your Nawed Dev account."
+      subtitle="Keep your session active and use the account controls from the portfolio navbar."
     >
       <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 380 }}>
         <div className="section-eyebrow">Sign In</div>
-        <h2 style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '2rem', marginBottom: '0.5rem' }}>Continue to Dashboard</h2>
+        <h2 style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '2rem', marginBottom: '0.5rem' }}>Sign In</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
           Use your admin email and password.
         </p>
