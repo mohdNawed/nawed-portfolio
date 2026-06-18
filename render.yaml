@@ -15,6 +15,8 @@ services:
         sync: false
       - key: RECIPIENT_EMAIL
         sync: false
+      - key: JWT_SECRET
+        sync: false
       - key: MONGO_URI
         sync: false
       - key: MONGO_DB_NAME

@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import API_BASE_URL from '../config';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
   const [hireData, setHireData] = useState([]);
   const [contactData, setContactData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { token, user, signOut } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const requestOptions = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
         const [hireRes, contactRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/dashboard/hire`),
-          fetch(`${API_BASE_URL}/api/dashboard/contact`)
+          fetch(`${API_BASE_URL}/api/dashboard/hire`, requestOptions),
+          fetch(`${API_BASE_URL}/api/dashboard/contact`, requestOptions)
         ]);
 
         if (!hireRes.ok || !contactRes.ok) {
@@ -30,7 +35,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [token]);
 
   return (
     <section style={{ padding: '5rem 2rem', minHeight: '100vh', background: 'var(--off-white)' }}>
@@ -41,6 +46,26 @@ export default function Dashboard() {
           <p style={{ color: 'var(--gray-600)', maxWidth: 760, margin: '1rem auto 0' }}>
             View hire inquiries and contact messages stored in MongoDB. This dashboard shows live data from the backend.
           </p>
+          <div style={{
+            margin: '1.25rem auto 0',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            background: 'white',
+            border: '1px solid var(--gray-200)',
+            borderRadius: 100,
+            padding: '0.45rem 0.55rem 0.45rem 1rem',
+          }}>
+            <span style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>Signed in as <strong style={{ color: 'var(--black)' }}>{user?.name}</strong></span>
+            <button onClick={signOut} style={{
+              border: 'none',
+              borderRadius: 100,
+              background: 'var(--black)',
+              color: 'white',
+              padding: '0.45rem 1rem',
+              fontWeight: 700,
+            }}>Sign Out</button>
+          </div>
         </div>
 
         {loading && <div style={{ textAlign: 'center', color: 'var(--gray-600)' }}>Loading dashboard data…</div>}

@@ -71,6 +71,7 @@ This repository can run the frontend and API together on Vercel.
    - `MAIL_USER`
    - `MAIL_PASS`
    - `RECIPIENT_EMAIL`
+   - `JWT_SECRET`
    - `MONGO_URI` optional
    - `MONGO_DB_NAME` optional
 
@@ -87,6 +88,7 @@ The backend can also run as a normal Node web service on Render using `render.ya
    - `MAIL_USER`
    - `MAIL_PASS`
    - `RECIPIENT_EMAIL`
+   - `JWT_SECRET`
    - `MONGO_URI` optional
    - `MONGO_DB_NAME=portfolio`
    - `CORS_ORIGIN=https://naweddev.com,https://nawed-portfolio-mohdnaweds-projects.vercel.app`
@@ -145,3 +147,10 @@ VITE_API_BASE_URL=https://your-backend.example.com
 - This publishes only the frontend static site.
 - Your backend still needs a separate Node deployment.
 - Use an external Node host or Hostinger Node hosting for the backend.
+
+## Auth
+- `/signup` creates an account through `POST /api/auth/signup`.
+- `/signin` logs in through `POST /api/auth/signin`.
+- `/dashboard` is protected and requires a valid backend token.
+- Set `JWT_SECRET` in production.
+- Set `MONGO_URI` in production so users persist across deploys and server restarts. Without MongoDB, auth works only as a temporary local development fallback.

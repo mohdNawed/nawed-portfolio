@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ onHireClick }) {
   const [scrolled, setScrolled] = useState(false);
   const baseUrl = import.meta.env.BASE_URL;
+  const { isAuthenticated, user, signOut } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -68,17 +70,37 @@ export default function Navbar({ onHireClick }) {
         ))}
       </ul>
 
-      <button onClick={onHireClick} style={{
-        background: 'var(--black)', color: 'white', border: 'none',
-        padding: '0.5rem 1.25rem', borderRadius: 100, fontSize: '0.875rem',
-        fontWeight: 500, cursor: 'pointer', transition: 'background 0.2s'
-      }}
-        onMouseEnter={e => e.target.style.background = 'var(--accent)'}
-        onMouseLeave={e => e.target.style.background = 'var(--black)'}
-      >✉ Hire Me</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {isAuthenticated ? (
+          <>
+            <span className="nav-user" style={{ fontSize: '0.78rem', color: 'var(--gray-600)', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user?.name}
+            </span>
+            <button onClick={signOut} style={{
+              background: 'white', color: 'var(--gray-600)', border: '1.5px solid var(--gray-200)',
+              padding: '0.5rem 1rem', borderRadius: 100, fontSize: '0.82rem',
+              fontWeight: 600, cursor: 'pointer'
+            }}>Sign Out</button>
+          </>
+        ) : (
+          <Link to="/signin" style={{
+            color: 'var(--gray-600)', border: '1.5px solid var(--gray-200)',
+            padding: '0.5rem 1rem', borderRadius: 100, fontSize: '0.82rem',
+            fontWeight: 600,
+          }}>Sign In</Link>
+        )}
+        <button onClick={onHireClick} style={{
+          background: 'var(--black)', color: 'white', border: 'none',
+          padding: '0.5rem 1.25rem', borderRadius: 100, fontSize: '0.875rem',
+          fontWeight: 500, cursor: 'pointer', transition: 'background 0.2s'
+        }}
+          onMouseEnter={e => e.target.style.background = 'var(--accent)'}
+          onMouseLeave={e => e.target.style.background = 'var(--black)'}
+        >✉ Hire Me</button>
+      </div>
 
       <style>{`
-        @media (max-width: 768px) { .nav-links-desktop { display: none !important; } }
+        @media (max-width: 768px) { .nav-links-desktop, .nav-user { display: none !important; } }
       `}</style>
     </nav>
   );
