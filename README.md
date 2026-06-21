@@ -1,4 +1,4 @@
-# Nawed Portfolio — React + Express
+# Nawed Portfolio - React + Express + Supabase
 
 A full-stack personal portfolio for Md Nawed Alam, Full Stack Developer.
 
@@ -8,6 +8,8 @@ A full-stack personal portfolio for Md Nawed Alam, Full Stack Developer.
 nawed-portfolio/
 ├── api/
 │   └── server.js         ← Express API routes and Render/Vercel backend entry
+├── supabase/
+│   └── schema.sql        ← Message table, indexes, grants, and RLS setup
 ├── public/
 │   └── Nawed_Resume.pdf  ← Downloadable CV
 └── src/
@@ -56,6 +58,21 @@ npm start
 |--------|-------|-------------|
 | POST | /api/hire | Sends hire inquiry email |
 | POST | /api/contact | Sends general contact email |
+| GET | /api/admin/messages | Lists all messages for the admin |
+| PATCH | /api/admin/messages/:id | Updates message status |
+| DELETE | /api/admin/messages/:id | Deletes a message |
+
+## Supabase message backend
+
+1. Create a Supabase project.
+2. Open its SQL Editor and run `supabase/schema.sql` once.
+3. Add these server environment variables:
+   - `SUPABASE_URL`
+   - `SUPABASE_SECRET_KEY` (or legacy `SUPABASE_SERVICE_ROLE_KEY`)
+   - `ADMIN_EMAILS=your-admin-email@gmail.com`
+4. Never expose the Supabase secret key through a `VITE_` environment variable.
+
+The `portfolio_messages` table has RLS enabled. Browser roles have no table access; only the server API can manage messages. If Supabase is not configured, the API temporarily falls back to MongoDB.
 
 ## Deploy
 - Frontend: Vercel / GitHub Pages / Hostinger static site (`npm run build`)
@@ -72,6 +89,9 @@ This repository can run the frontend and API together on Vercel.
    - `MAIL_PASS`
    - `RECIPIENT_EMAIL`
    - `JWT_SECRET`
+   - `ADMIN_EMAILS`
+   - `SUPABASE_URL`
+   - `SUPABASE_SECRET_KEY`
    - `MONGO_URI` optional
    - `MONGO_DB_NAME` optional
 
@@ -89,6 +109,9 @@ The backend can also run as a normal Node web service on Render using `render.ya
    - `MAIL_PASS`
    - `RECIPIENT_EMAIL`
    - `JWT_SECRET`
+   - `ADMIN_EMAILS`
+   - `SUPABASE_URL`
+   - `SUPABASE_SECRET_KEY`
    - `MONGO_URI` optional
    - `MONGO_DB_NAME=portfolio`
    - `CORS_ORIGIN=https://naweddev.com,https://nawed-portfolio-mohdnaweds-projects.vercel.app`
@@ -152,5 +175,7 @@ VITE_API_BASE_URL=https://your-backend.example.com
 - `/signup` creates an account through `POST /api/auth/signup`.
 - `/signin` logs in through `POST /api/auth/signin`.
 - The navbar shows Sign In when logged out and Sign Out when logged in.
+- `/admin` is restricted to emails listed in `ADMIN_EMAILS` and manages contact and hire messages.
+- Public signups receive a normal member role and cannot access admin APIs. Admin emails cannot be registered through the public signup form.
 - Set `JWT_SECRET` in production.
 - Set `MONGO_URI` in production so users persist across deploys and server restarts. Without MongoDB, auth works only as a temporary local development fallback.

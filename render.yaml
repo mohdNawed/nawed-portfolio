@@ -17,6 +17,12 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
       - key: MONGO_URI
         sync: false
       - key: MONGO_DB_NAME

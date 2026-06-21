@@ -31,6 +31,7 @@ export default function Navbar({ onHireClick }) {
     { label: 'Skills', href: `${baseUrl}#skills` },
     { label: 'Social', href: `${baseUrl}#social` },
     { label: 'Contact', href: `${baseUrl}#contact` },
+    ...(user?.role === 'admin' ? [{ label: 'Admin', to: '/admin' }] : []),
   ];
 
   return (

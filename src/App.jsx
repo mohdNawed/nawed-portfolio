@@ -15,6 +15,7 @@ import Footer from './components/Footer';
 import NotFound from './components/NotFound';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
+import AdminPanel from './components/AdminPanel';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
@@ -69,6 +70,7 @@ function App() {
         <Route path="/" element={<HomePage onHireClick={() => setHireOpen(true)} />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/admin" element={<AdminPanel />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <HireModal open={hireOpen} onClose={() => setHireOpen(false)} />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
 import AuthLayout from './AuthLayout';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +19,7 @@ export default function SignIn() {
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { saveSession } = useAuth();
 
   const handleChange = event => setForm(current => ({ ...current, [event.target.name]: event.target.value }));
@@ -38,7 +39,8 @@ export default function SignIn() {
       if (!response.ok || !data.success) throw new Error(data.message || 'Sign in failed.');
 
       saveSession(data.token, data.user);
-      navigate('/', { replace: true });
+      const destination = location.state?.from || (data.user.role === 'admin' ? '/admin' : '/');
+      navigate(destination, { replace: true });
     } catch (err) {
       setError(err.message || 'Could not sign in.');
       setStatus('error');
@@ -49,7 +51,7 @@ export default function SignIn() {
     <AuthLayout
       eyebrow="Welcome Back"
       title="Sign in to your Nawed Dev account."
-      subtitle="Keep your session active and use the account controls from the portfolio navbar."
+      subtitle="Sign in securely to access your Nawed Dev account and private admin tools."
     >
       <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 380 }}>
         <div className="section-eyebrow">Sign In</div>

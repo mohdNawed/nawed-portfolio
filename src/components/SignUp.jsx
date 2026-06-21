@@ -49,11 +49,11 @@ export default function SignUp() {
     <AuthLayout
       eyebrow="Create Access"
       title="Create your Nawed Dev account."
-      subtitle="The backend stores your account securely and keeps the navbar login/logout state in sync."
+      subtitle="Create your Nawed Dev account and keep your login state in sync across the portfolio."
     >
       <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 380 }}>
         <div className="section-eyebrow">Sign Up</div>
-        <h2 style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '2rem', marginBottom: '0.5rem' }}>Create Admin Account</h2>
+        <h2 style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '2rem', marginBottom: '0.5rem' }}>Create Account</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
           Use a strong password with at least 8 characters.
         </p>

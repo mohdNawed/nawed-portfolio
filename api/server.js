@@ -3,7 +3,14 @@ const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
+const {
+  deletePortfolioMessage,
+  hasSupabaseConfig,
+  listPortfolioMessages,
+  savePortfolioMessage,
+  updatePortfolioMessage,
+} = require('./supabase');
 
 const app = express();
 app.use(cors({
@@ -14,6 +21,15 @@ app.use(express.json());
 let db;
 let client;
 const memoryUsers = [];
+
+const adminEmails = new Set(
+  String(process.env.ADMIN_EMAILS || process.env.RECIPIENT_EMAIL || '')
+    .split(',')
+    .map(email => email.trim().toLowerCase())
+    .filter(Boolean),
+);
+
+const isAdminEmail = email => adminEmails.has(normalizeEmail(email));
 
 const connectMongo = async () => {
   if (db) return db;
@@ -34,10 +50,11 @@ const connectMongo = async () => {
 const saveDocument = async (collectionName, document) => {
   try {
     const database = await connectMongo();
-    if (!database) return;
-    await database.collection(collectionName).insertOne(document);
+    if (!database) return null;
+    return database.collection(collectionName).insertOne(document);
   } catch (error) {
     console.error(`Could not save ${collectionName}:`, error.message);
+    throw error;
   }
 };
 
@@ -99,7 +116,7 @@ const createUser = async ({ name, email, password }) => {
     name,
     email,
     passwordHash: hashPassword(password),
-    role: 'admin',
+    role: isAdminEmail(email) ? 'admin' : 'member',
     createdAt: new Date(),
   };
 
@@ -117,7 +134,7 @@ const createUser = async ({ name, email, password }) => {
 const publicUser = (user) => ({
   name: user.name,
   email: user.email,
-  role: user.role || 'admin',
+  role: isAdminEmail(user.email) ? 'admin' : 'member',
 });
 
 const requireAuth = (req, res, next) => {
@@ -130,6 +147,15 @@ const requireAuth = (req, res, next) => {
 
   req.user = payload;
   next();
+};
+
+const requireAdmin = (req, res, next) => {
+  requireAuth(req, res, () => {
+    if (!isAdminEmail(req.user.email)) {
+      return res.status(403).json({ success: false, message: 'Admin access is required.' });
+    }
+    next();
+  });
 };
 
 const sanitizeInput = (value) => {
@@ -155,6 +181,13 @@ app.post('/api/auth/signup', async (req, res) => {
 
   if (password.length < 8) {
     return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
+  }
+
+  if (isAdminEmail(email)) {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin accounts cannot be created from the public signup form.',
+    });
   }
 
   try {
@@ -226,6 +259,19 @@ const sendPortfolioEmail = async ({ replyTo, subject, text, html }) => {
   });
 };
 
+const persistPortfolioMessage = async (type, document) => {
+  if (hasSupabaseConfig()) {
+    return savePortfolioMessage(type, document);
+  }
+
+  const collectionName = type === 'hire' ? 'hireInquiries' : 'contactMessages';
+  return saveDocument(collectionName, {
+    ...document,
+    status: 'new',
+    updatedAt: new Date(),
+  });
+};
+
 app.post('/api/hire', async (req, res) => {
   const { name, email, projectType, budget, details } = req.body;
 
@@ -254,29 +300,38 @@ app.post('/api/hire', async (req, res) => {
       source: 'hire-form',
     };
 
-    await sendPortfolioEmail({
-      replyTo: sanitizedEmail,
-      subject: `Hire Inquiry from ${sanitizedName}`,
-      text: `New inquiry from ${sanitizedName} (${sanitizedEmail}). Project: ${sanitizedProjectType}. Budget: ${sanitizedBudget}. Details: ${sanitizedDetails}`,
-      html: `
-        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#18181b">
-          <h2>New Hire Inquiry</h2>
-          <p><strong>Name:</strong> ${sanitizedName}</p>
-          <p><strong>Email:</strong> ${sanitizedEmail}</p>
-          <p><strong>Project Type:</strong> ${sanitizedProjectType || 'Not specified'}</p>
-          <p><strong>Budget:</strong> ${sanitizedBudget || 'Not specified'}</p>
-          <p><strong>Details:</strong></p>
-          <p>${sanitizedDetails || 'Not provided'}</p>
-        </div>
-      `,
+    await persistPortfolioMessage('hire', inquiryDocument);
+
+    let emailSent = true;
+    try {
+      await sendPortfolioEmail({
+        replyTo: sanitizedEmail,
+        subject: `Hire Inquiry from ${sanitizedName}`,
+        text: `New inquiry from ${sanitizedName} (${sanitizedEmail}). Project: ${sanitizedProjectType}. Budget: ${sanitizedBudget}. Details: ${sanitizedDetails}`,
+        html: `
+          <div style="font-family:Arial,sans-serif;line-height:1.6;color:#18181b">
+            <h2>New Hire Inquiry</h2>
+            <p><strong>Name:</strong> ${sanitizedName}</p>
+            <p><strong>Email:</strong> ${sanitizedEmail}</p>
+            <p><strong>Project Type:</strong> ${sanitizedProjectType || 'Not specified'}</p>
+            <p><strong>Budget:</strong> ${sanitizedBudget || 'Not specified'}</p>
+            <p><strong>Details:</strong></p>
+            <p>${sanitizedDetails || 'Not provided'}</p>
+          </div>
+        `,
+      });
+    } catch (emailError) {
+      emailSent = false;
+      console.error('Hire notification email error:', emailError.message);
+    }
+
+    res.status(emailSent ? 200 : 202).json({
+      success: true,
+      message: emailSent ? 'Inquiry sent successfully!' : 'Inquiry saved successfully. Email notification is delayed.',
     });
-
-    await saveDocument('hireInquiries', inquiryDocument);
-
-    res.json({ success: true, message: 'Email sent successfully!', data: inquiryDocument });
   } catch (error) {
-    console.error('Hire email error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to send email.' });
+    console.error('Hire inquiry error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to save your inquiry.' });
   }
 });
 
@@ -304,41 +359,122 @@ app.post('/api/contact', async (req, res) => {
       source: 'contact-form',
     };
 
-    await sendPortfolioEmail({
-      replyTo: sanitizedEmail,
-      subject: `Contact from ${sanitizedName}`,
-      text: `New contact message from ${sanitizedName} (${sanitizedEmail}).\n\n${sanitizedMessage}`,
-      html: `<p><b>From:</b> ${sanitizedName} (${sanitizedEmail})</p><p><b>Message:</b> ${sanitizedMessage}</p>`,
+    await persistPortfolioMessage('contact', messageDocument);
+
+    let emailSent = true;
+    try {
+      await sendPortfolioEmail({
+        replyTo: sanitizedEmail,
+        subject: `Contact from ${sanitizedName}`,
+        text: `New contact message from ${sanitizedName} (${sanitizedEmail}).\n\n${sanitizedMessage}`,
+        html: `<p><b>From:</b> ${sanitizedName} (${sanitizedEmail})</p><p><b>Message:</b> ${sanitizedMessage}</p>`,
+      });
+    } catch (emailError) {
+      emailSent = false;
+      console.error('Contact notification email error:', emailError.message);
+    }
+
+    res.status(emailSent ? 200 : 202).json({
+      success: true,
+      message: emailSent ? 'Message sent!' : 'Message saved successfully. Email notification is delayed.',
     });
-
-    await saveDocument('contactMessages', messageDocument);
-
-    res.json({ success: true, message: 'Message sent!', data: messageDocument });
   } catch (error) {
-    console.error('Contact email error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to send message.' });
+    console.error('Contact message error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to save your message.' });
   }
 });
 
-app.get('/api/dashboard/hire', requireAuth, async (req, res) => {
+const normalizeMongoMessage = (item, type) => ({
+  id: String(item._id),
+  type,
+  name: item.name,
+  email: item.email,
+  message: item.message || item.details || 'Not provided',
+  project_type: item.projectType || null,
+  budget: item.budget || null,
+  source: item.source,
+  status: item.status || 'new',
+  created_at: item.createdAt,
+  updated_at: item.updatedAt || item.createdAt,
+});
+
+app.get('/api/admin/messages', requireAdmin, async (req, res) => {
   try {
+    if (hasSupabaseConfig()) {
+      const messages = await listPortfolioMessages();
+      return res.json({ success: true, data: messages, storage: 'supabase' });
+    }
+
     const database = await connectMongo();
-    if (!database) return res.json({ success: true, data: [] });
-    const items = await database.collection('hireInquiries').find({}).sort({ createdAt: -1 }).toArray();
-    res.json({ success: true, data: items });
+    if (!database) return res.json({ success: true, data: [], storage: 'memory' });
+
+    const [contacts, hires] = await Promise.all([
+      database.collection('contactMessages').find({}).toArray(),
+      database.collection('hireInquiries').find({}).toArray(),
+    ]);
+    const messages = [
+      ...contacts.map(item => normalizeMongoMessage(item, 'contact')),
+      ...hires.map(item => normalizeMongoMessage(item, 'hire')),
+    ].sort((left, right) => new Date(right.created_at) - new Date(left.created_at));
+
+    res.json({ success: true, data: messages, storage: 'mongodb' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to fetch hire inquiries.' });
+    console.error('Admin message list error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to load messages.' });
   }
 });
 
-app.get('/api/dashboard/contact', requireAuth, async (req, res) => {
+app.patch('/api/admin/messages/:id', requireAdmin, async (req, res) => {
+  const status = String(req.body.status || '').toLowerCase();
+  if (!['new', 'read', 'archived'].includes(status)) {
+    return res.status(400).json({ success: false, message: 'Invalid message status.' });
+  }
+
   try {
+    if (hasSupabaseConfig()) {
+      const message = await updatePortfolioMessage(req.params.id, status);
+      return res.json({ success: true, data: message });
+    }
+
     const database = await connectMongo();
-    if (!database) return res.json({ success: true, data: [] });
-    const items = await database.collection('contactMessages').find({}).sort({ createdAt: -1 }).toArray();
-    res.json({ success: true, data: items });
+    const type = req.body.type === 'hire' ? 'hire' : 'contact';
+    if (!database || !ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: 'Message not found.' });
+    }
+
+    const collectionName = type === 'hire' ? 'hireInquiries' : 'contactMessages';
+    const result = await database.collection(collectionName).updateOne(
+      { _id: new ObjectId(req.params.id) },
+      { $set: { status, updatedAt: new Date() } },
+    );
+    if (!result.matchedCount) return res.status(404).json({ success: false, message: 'Message not found.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to fetch contact messages.' });
+    console.error('Admin message update error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to update message.' });
+  }
+});
+
+app.delete('/api/admin/messages/:id', requireAdmin, async (req, res) => {
+  try {
+    if (hasSupabaseConfig()) {
+      await deletePortfolioMessage(req.params.id);
+      return res.json({ success: true });
+    }
+
+    const database = await connectMongo();
+    const type = req.query.type === 'hire' ? 'hire' : 'contact';
+    if (!database || !ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: 'Message not found.' });
+    }
+
+    const collectionName = type === 'hire' ? 'hireInquiries' : 'contactMessages';
+    const result = await database.collection(collectionName).deleteOne({ _id: new ObjectId(req.params.id) });
+    if (!result.deletedCount) return res.status(404).json({ success: false, message: 'Message not found.' });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Admin message delete error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to delete message.' });
   }
 });
 
@@ -347,6 +483,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     service: 'Nawed Dev backend',
     platform: process.env.RENDER ? 'render' : 'node',
+    messageStorage: hasSupabaseConfig() ? 'supabase' : (process.env.MONGO_URI ? 'mongodb' : 'memory'),
   });
 });
 
