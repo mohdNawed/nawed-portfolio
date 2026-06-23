@@ -7,12 +7,30 @@ const hasSupabaseConfig = () => Boolean(
   && (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)
 );
 
+const normalizeSupabaseUrl = () => {
+  const rawUrl = String(process.env.SUPABASE_URL || '').trim();
+
+  try {
+    const parsedUrl = new URL(rawUrl);
+    const isHostedProject = parsedUrl.hostname.endsWith('.supabase.co');
+    const isLocalProject = ['localhost', '127.0.0.1'].includes(parsedUrl.hostname);
+
+    if (!isHostedProject && !isLocalProject) {
+      throw new Error('Unexpected Supabase host');
+    }
+
+    return parsedUrl.origin;
+  } catch {
+    throw new Error('SUPABASE_URL must be the project URL, for example https://project-ref.supabase.co.');
+  }
+};
+
 const getSupabase = () => {
   if (!hasSupabaseConfig()) return null;
   if (supabase) return supabase;
 
   supabase = createClient(
-    process.env.SUPABASE_URL,
+    normalizeSupabaseUrl(),
     process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY,
     {
       auth: {
