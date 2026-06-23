@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const crypto = require('crypto');
 const { MongoClient, ObjectId } = require('mongodb');
 const {
@@ -20,6 +21,7 @@ app.use(express.json());
 
 let db;
 let client;
+let resend;
 const memoryUsers = [];
 
 const adminEmails = new Set(
@@ -247,6 +249,25 @@ const createTransporter = () => {
 };
 
 const sendPortfolioEmail = async ({ replyTo, subject, text, html }) => {
+  if (process.env.RESEND_API_KEY) {
+    if (!process.env.RECIPIENT_EMAIL) {
+      throw new Error('RECIPIENT_EMAIL is not configured.');
+    }
+
+    resend ||= new Resend(process.env.RESEND_API_KEY);
+    const { error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'Nawed Dev <onboarding@resend.dev>',
+      to: [process.env.RECIPIENT_EMAIL],
+      replyTo,
+      subject,
+      text,
+      html,
+    });
+
+    if (error) throw new Error(error.message || 'Resend could not deliver the notification.');
+    return;
+  }
+
   const transporter = createTransporter();
 
   await transporter.sendMail({
@@ -484,6 +505,7 @@ app.get('/api/health', (req, res) => {
     service: 'Nawed Dev backend',
     platform: process.env.RENDER ? 'render' : 'node',
     messageStorage: hasSupabaseConfig() ? 'supabase' : (process.env.MONGO_URI ? 'mongodb' : 'memory'),
+    notificationProvider: process.env.RESEND_API_KEY ? 'resend' : (process.env.MAIL_USER ? 'gmail' : 'unconfigured'),
   });
 });
 

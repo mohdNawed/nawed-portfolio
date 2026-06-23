@@ -74,6 +74,10 @@ npm start
 
 The `portfolio_messages` table has RLS enabled. Browser roles have no table access; only the server API can manage messages. If Supabase is not configured, the API temporarily falls back to MongoDB.
 
+## Email notifications
+
+Resend is the preferred notification provider. Add `RESEND_API_KEY` and `RECIPIENT_EMAIL` on Vercel. During initial testing, `RESEND_FROM_EMAIL` can be `Nawed Dev <onboarding@resend.dev>`; use an address on a verified domain for production sending. Gmail remains an optional fallback when no Resend key is configured.
+
 ## Deploy
 - Frontend: Vercel / GitHub Pages / Hostinger static site (`npm run build`)
 - Backend: Vercel serverless API or Render web service
