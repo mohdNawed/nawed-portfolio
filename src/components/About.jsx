@@ -4,26 +4,26 @@ import { FaArrowRight, FaCode, FaDatabase, FaLayerGroup, FaRocket } from 'react-
 const strengths = [
   {
     icon: FaLayerGroup,
-    title: 'Full-stack thinking',
-    text: 'I connect polished interfaces with reliable APIs, databases, and practical user flows.',
+    title: 'Learn and adapt quickly',
+    text: 'I pick up new tools by building practical features, reading docs, and improving through feedback.',
     color: '#4f46e5',
   },
   {
     icon: FaCode,
-    title: 'Clean implementation',
-    text: 'I value readable code, reusable components, and solutions that remain easy to improve.',
+    title: 'Break problems into steps',
+    text: 'I turn unclear requirements into smaller tasks, then solve them with steady, readable implementation.',
     color: '#0f766e',
   },
   {
     icon: FaDatabase,
-    title: 'Data-driven products',
-    text: 'I work with MongoDB, SQL, PostgreSQL, Firebase, and other modern data tools.',
+    title: 'Connect frontend to backend',
+    text: 'I understand how UI, APIs, authentication, databases, and deployment work together in real applications.',
     color: '#b45309',
   },
   {
     icon: FaRocket,
-    title: 'From idea to launch',
-    text: 'I enjoy taking projects through development, testing, deployment, and iteration.',
+    title: 'Own the full delivery',
+    text: 'I enjoy taking a feature from idea to working product, testing it, deploying it, and refining the result.',
     color: '#be123c',
   },
 ];
@@ -36,7 +36,7 @@ export default function About({ onHireClick }) {
           <div>
             <div className="section-eyebrow">About Me</div>
             <h2 className="section-title" style={{ maxWidth: 470 }}>
-              Developer by skill, problem solver by mindset.
+              Fresher mindset with real project habits.
             </h2>
           </div>
 
@@ -49,11 +49,13 @@ export default function About({ onHireClick }) {
           }}>
             <p style={{ marginBottom: '1rem' }}>
               I'm <strong style={{ color: 'var(--black)' }}>Md Nawed Alam</strong>, an MCA graduate and full-stack
-              developer who enjoys turning ideas into useful, responsive, and dependable digital products.
+              developer focused on becoming useful from day one: understanding the requirement, asking better
+              questions, building carefully, and improving with feedback.
             </p>
             <p>
-              My work spans React, Node.js, Express, MongoDB, Java, TypeScript, SQL, Docker, and cloud deployment.
-              I learn by building, improving, and solving the details that make an application feel complete.
+              Instead of only showing a long list of tools, my portfolio shows how I adapt across frontend,
+              backend, databases, authentication, admin panels, and deployment. I learn by shipping complete
+              features and solving the details that make an application reliable.
             </p>
           </div>
         </div>
@@ -74,7 +76,7 @@ export default function About({ onHireClick }) {
               textTransform: 'uppercase',
               marginBottom: '1rem',
             }}>
-              My approach
+              Hiring value
             </div>
             <h3 style={{
               fontFamily: 'Space Grotesk,sans-serif',
@@ -82,11 +84,11 @@ export default function About({ onHireClick }) {
               lineHeight: 1.3,
               marginBottom: '1rem',
             }}>
-              Build with purpose. Keep learning. Ship work that matters.
+              I bring curiosity, ownership, and the patience to solve unfamiliar problems.
             </h3>
             <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: '0.9rem', lineHeight: 1.8 }}>
-              I care about understanding the problem before choosing the technology. My goal is always a product
-              that is clear for users, maintainable for developers, and ready to grow.
+              For fresher roles, I believe the strongest skill is adaptability. I can work with existing code,
+              learn a new stack when needed, communicate progress clearly, and keep improving until the feature works.
             </p>
 
             <div style={{
@@ -163,11 +165,11 @@ export default function About({ onHireClick }) {
           </div>
           <div>
             <span>Primary focus</span>
-            <strong>Full-stack web development</strong>
+            <strong>Adaptive full-stack development</strong>
           </div>
           <div>
             <span>Currently open to</span>
-            <strong>Freelance and full-time roles</strong>
+            <strong>Fresher roles, internships and freelance</strong>
           </div>
         </div>
       </div>

@@ -27,22 +27,22 @@ export default function Hero({ onHireClick }) {
           color: 'var(--gray-600)', marginBottom: '1.5rem'
         }}>
           <span style={{ width: 7, height: 7, background: '#22c55e', borderRadius: '50%', display: 'inline-block' }} />
-          Available for freelance work
+          Open to fresher developer roles
         </div>
 
         <h1 style={{
           fontFamily: 'Space Grotesk,sans-serif', fontSize: 'clamp(2.2rem,4vw,3.2rem)',
           fontWeight: 800, lineHeight: 1.15, color: 'var(--black)', marginBottom: '1.25rem'
         }}>
-          Building digital<br />
-          products with{' '}
-          <em style={{ fontStyle: 'normal', color: 'var(--accent)' }}>code</em>
-          <br />&amp; craft.
+          Adaptive developer<br />
+          ready to{' '}
+          <em style={{ fontStyle: 'normal', color: 'var(--accent)' }}>learn</em>
+          <br />build &amp; ship.
         </h1>
 
         <p style={{ fontSize: '1.05rem', color: 'var(--text-muted)', maxWidth: 440, marginBottom: '2rem', lineHeight: 1.75 }}>
-          I'm Nawed, a Full Stack Developer skilled in MERN Stack, Java, TypeScript, Docker and more —
-          turning ideas into fast, functional web products.
+          I'm Nawed, a full-stack developer who learns fast, breaks problems into clear steps,
+          and turns ideas into usable web products with clean UI, APIs, databases, and deployment.
         </p>
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -108,7 +108,7 @@ export default function Hero({ onHireClick }) {
           <div style={{ width: 36, height: 36, background: 'var(--accent-light)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>🎓</div>
           <div>
             <strong style={{ display: 'block', fontSize: '0.9rem' }}>MCA Graduate</strong>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Full Stack Developer</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Adaptive Full Stack Developer</span>
           </div>
         </div>
       </div>
