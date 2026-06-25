@@ -37,10 +37,41 @@ export default function Contact({ onHireClick }) {
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <div className="section-eyebrow">Get In Touch</div>
-          <div className="section-title">Let's Build Something</div>
+          <div className="section-title">Hire Nawed For Your Team</div>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.75rem', fontSize: '0.95rem' }}>
-            Have a project in mind or want to hire me? Drop a message or use the Hire Me form.
+            Open to Full Stack Developer fresher roles, internships, and freelance web projects.
+            I usually respond within 24 hours.
           </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '0.75rem',
+          marginBottom: '1.25rem',
+        }}>
+          {[
+            ['Email', 'mdalamnawed@gmail.com', 'mailto:mdalamnawed@gmail.com'],
+            ['GitHub', 'github.com/mohdNawed', 'https://github.com/mohdNawed'],
+            ['LinkedIn', 'Md Nawed Alam', 'https://www.linkedin.com/in/md-nawed-alam-05b3b2240/'],
+            ['Location', 'New Delhi, India', null],
+          ].map(([label, value, href]) => (
+            <div key={label} style={{
+              background: 'white',
+              border: '1px solid var(--gray-200)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '0.85rem 1rem',
+            }}>
+              <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{label}</span>
+              {href ? (
+                <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noreferrer' : undefined} style={{ color: 'var(--black)', fontSize: '0.84rem', fontWeight: 700, textDecoration: 'none' }}>
+                  {value}
+                </a>
+              ) : (
+                <strong style={{ color: 'var(--black)', fontSize: '0.84rem' }}>{value}</strong>
+              )}
+            </div>
+          ))}
         </div>
 
         {status === 'success' ? (
@@ -97,6 +128,11 @@ export default function Contact({ onHireClick }) {
                 border: '1.5px solid var(--accent)', borderRadius: 100, fontSize: '0.9rem',
                 fontWeight: 600, cursor: 'pointer'
               }}>🚀 Full Hire Form</button>
+              <a href={`${import.meta.env.BASE_URL}Nawed_Resume.pdf`} download style={{
+                padding: '0.8rem 1.2rem', background: 'white', color: 'var(--black)',
+                border: '1.5px solid var(--gray-200)', borderRadius: 100, fontSize: '0.9rem',
+                fontWeight: 600, textDecoration: 'none'
+              }}>↓ Resume</a>
             </div>
           </form>
         )}

@@ -79,6 +79,26 @@ export default function Projects() {
                 <h3 style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.5rem' }}>{p.title}</h3>
                 <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: '1rem' }}>{p.description}</p>
 
+                {p.features?.length > 0 && (
+                  <ul style={{
+                    display: 'grid',
+                    gap: '0.35rem',
+                    padding: 0,
+                    margin: '0 0 1rem',
+                    listStyle: 'none',
+                    color: 'var(--gray-700)',
+                    fontSize: '0.78rem',
+                    lineHeight: 1.45,
+                  }}>
+                    {p.features.map(feature => (
+                      <li key={feature} style={{ display: 'flex', gap: '0.45rem' }}>
+                        <span style={{ color: 'var(--accent)', fontWeight: 800 }}>✓</span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
                 {/* Tech pills */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
                   {p.tech.map(t => (

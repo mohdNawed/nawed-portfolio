@@ -27,23 +27,42 @@ export default function Hero({ onHireClick }) {
           color: 'var(--gray-600)', marginBottom: '1.5rem'
         }}>
           <span style={{ width: 7, height: 7, background: '#22c55e', borderRadius: '50%', display: 'inline-block' }} />
-          Open to fresher developer roles
+          Full Stack MERN Developer | MCA Graduate
         </div>
 
         <h1 style={{
           fontFamily: 'Space Grotesk,sans-serif', fontSize: 'clamp(2.2rem,4vw,3.2rem)',
           fontWeight: 800, lineHeight: 1.15, color: 'var(--black)', marginBottom: '1.25rem'
         }}>
-          Adaptive developer<br />
-          ready to{' '}
-          <em style={{ fontStyle: 'normal', color: 'var(--accent)' }}>learn</em>
-          <br />build &amp; ship.
+          Hi, I'm Md Nawed Alam<br />
+          <em style={{ fontStyle: 'normal', color: 'var(--accent)' }}>Full Stack</em>
+          <br />MERN Developer.
         </h1>
 
         <p style={{ fontSize: '1.05rem', color: 'var(--text-muted)', maxWidth: 440, marginBottom: '2rem', lineHeight: 1.75 }}>
-          I'm Nawed, a full-stack developer who learns fast, breaks problems into clear steps,
-          and turns ideas into usable web products with clean UI, APIs, databases, and deployment.
+          I build responsive, scalable, and modern web applications using React, Node.js, Express,
+          MongoDB, and JavaScript. As a fresher, I bring hands-on project experience, adaptability,
+          and a quick learning mindset.
         </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(130px, 1fr))', gap: '0.6rem', maxWidth: 440, marginBottom: '2rem' }}>
+          {[
+            ['12+', 'Projects Built'],
+            ['5+', 'Full-stack Apps'],
+            ['MCA', 'Graduate'],
+            ['Open', 'Fresher Roles'],
+          ].map(([num, label]) => (
+            <div key={label} style={{
+              border: '1px solid var(--gray-200)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '0.7rem 0.85rem',
+              background: 'white',
+            }}>
+              <strong style={{ display: 'block', color: 'var(--black)', fontSize: '1rem', fontFamily: 'Space Grotesk,sans-serif' }}>{num}</strong>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.76rem', fontWeight: 600 }}>{label}</span>
+            </div>
+          ))}
+        </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <a href="#projects" style={{
@@ -64,7 +83,17 @@ export default function Hero({ onHireClick }) {
           }}
             onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--gray-400)'}
             onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--gray-200)'}
-          >↓ Download CV</a>
+          >↓ Download Resume</a>
+
+          <a href={`${baseUrl}Nawed_Resume.pdf`} target="_blank" rel="noreferrer" style={{
+            background: 'transparent', color: 'var(--text)', padding: '0.7rem 1.5rem',
+            borderRadius: 100, fontSize: '0.9rem', fontWeight: 500,
+            border: '1.5px solid var(--gray-200)', display: 'inline-flex',
+            alignItems: 'center', gap: 6, transition: 'border-color 0.2s', textDecoration: 'none'
+          }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--gray-400)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--gray-200)'}
+          >View Resume</a>
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '2rem' }}>
@@ -108,7 +137,7 @@ export default function Hero({ onHireClick }) {
           <div style={{ width: 36, height: 36, background: 'var(--accent-light)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>🎓</div>
           <div>
             <strong style={{ display: 'block', fontSize: '0.9rem' }}>MCA Graduate</strong>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Adaptive Full Stack Developer</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Open to fresher roles</span>
           </div>
         </div>
       </div>
