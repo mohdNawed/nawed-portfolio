@@ -6,10 +6,14 @@ const { Resend } = require('resend');
 const crypto = require('crypto');
 const { MongoClient, ObjectId } = require('mongodb');
 const {
+  createPortfolioAuthUser,
   deletePortfolioMessage,
+  findPortfolioUserByEmail,
   hasSupabaseConfig,
   listPortfolioMessages,
   savePortfolioMessage,
+  savePortfolioUser,
+  signInPortfolioAuthUser,
   updatePortfolioMessage,
 } = require('./supabase');
 
@@ -108,6 +112,10 @@ const verifyToken = (token) => {
 };
 
 const findUserByEmail = async (email) => {
+  if (hasSupabaseConfig()) {
+    return findPortfolioUserByEmail(email);
+  }
+
   const database = await connectMongo();
   if (!database) return memoryUsers.find(user => user.email === email) || null;
   return database.collection('users').findOne({ email });
@@ -121,6 +129,10 @@ const createUser = async ({ name, email, password }) => {
     role: isAdminEmail(email) ? 'admin' : 'member',
     createdAt: new Date(),
   };
+
+  if (hasSupabaseConfig()) {
+    return savePortfolioUser(user);
+  }
 
   const database = await connectMongo();
   if (!database) {
@@ -193,6 +205,13 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 
   try {
+    if (hasSupabaseConfig()) {
+      const user = await createPortfolioAuthUser({ name, email, password });
+      const safeUser = publicUser(user);
+      const token = signToken(safeUser);
+      return res.status(201).json({ success: true, message: 'Account created successfully.', token, user: safeUser });
+    }
+
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
       return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
@@ -204,6 +223,9 @@ app.post('/api/auth/signup', async (req, res) => {
     res.status(201).json({ success: true, message: 'Account created successfully.', token, user: safeUser });
   } catch (error) {
     console.error('Signup error:', error.message);
+    if (/already|registered|exists/i.test(error.message)) {
+      return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
+    }
     res.status(500).json({ success: false, message: 'Could not create account.' });
   }
 });
@@ -217,6 +239,13 @@ app.post('/api/auth/signin', async (req, res) => {
   }
 
   try {
+    if (hasSupabaseConfig()) {
+      const user = await signInPortfolioAuthUser({ email, password });
+      const safeUser = publicUser(user);
+      const token = signToken(safeUser);
+      return res.json({ success: true, message: 'Signed in successfully.', token, user: safeUser });
+    }
+
     const user = await findUserByEmail(email);
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
@@ -227,6 +256,9 @@ app.post('/api/auth/signin', async (req, res) => {
     res.json({ success: true, message: 'Signed in successfully.', token, user: safeUser });
   } catch (error) {
     console.error('Signin error:', error.message);
+    if (/invalid|credentials|password|login/i.test(error.message)) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+    }
     res.status(500).json({ success: false, message: 'Could not sign in.' });
   }
 });
@@ -505,6 +537,7 @@ app.get('/api/health', (req, res) => {
     service: 'Nawed Dev backend',
     platform: process.env.RENDER ? 'render' : 'node',
     messageStorage: hasSupabaseConfig() ? 'supabase' : (process.env.MONGO_URI ? 'mongodb' : 'memory'),
+    authStorage: hasSupabaseConfig() ? 'supabase-auth' : (process.env.MONGO_URI ? 'mongodb' : 'memory'),
     notificationProvider: process.env.RESEND_API_KEY ? 'resend' : (process.env.MAIL_USER ? 'gmail' : 'unconfigured'),
   });
 });

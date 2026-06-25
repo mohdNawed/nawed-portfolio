@@ -55,6 +55,22 @@ const toDatabaseMessage = (type, message) => ({
   status: message.status || 'new',
 });
 
+const toDatabaseUser = (user) => ({
+  name: user.name,
+  email: user.email,
+  password_hash: user.passwordHash,
+  role: user.role || 'member',
+});
+
+const fromDatabaseUser = (user) => user && ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  passwordHash: user.password_hash,
+  role: user.role || 'member',
+  createdAt: user.created_at,
+});
+
 const savePortfolioMessage = async (type, message) => {
   const client = getSupabase();
   if (!client) return null;
@@ -110,10 +126,78 @@ const deletePortfolioMessage = async (id) => {
   return true;
 };
 
+const findPortfolioUserByEmail = async (email) => {
+  const client = getSupabase();
+  if (!client) return null;
+
+  const { data, error } = await client
+    .from('portfolio_users')
+    .select('*')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (error) throw error;
+  return fromDatabaseUser(data);
+};
+
+const savePortfolioUser = async (user) => {
+  const client = getSupabase();
+  if (!client) return null;
+
+  const { data, error } = await client
+    .from('portfolio_users')
+    .insert(toDatabaseUser(user))
+    .select()
+    .single();
+
+  if (error) throw error;
+  return fromDatabaseUser(data);
+};
+
+const toAuthUser = (authUser) => authUser && ({
+  id: authUser.id,
+  name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Portfolio User',
+  email: authUser.email,
+  role: 'member',
+  createdAt: authUser.created_at,
+});
+
+const createPortfolioAuthUser = async ({ name, email, password }) => {
+  const client = getSupabase();
+  if (!client) return null;
+
+  const { data, error } = await client.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { name },
+  });
+
+  if (error) throw error;
+  return toAuthUser(data.user);
+};
+
+const signInPortfolioAuthUser = async ({ email, password }) => {
+  const client = getSupabase();
+  if (!client) return null;
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) throw error;
+  return toAuthUser(data.user);
+};
+
 module.exports = {
+  createPortfolioAuthUser,
   deletePortfolioMessage,
+  findPortfolioUserByEmail,
   hasSupabaseConfig,
   listPortfolioMessages,
   savePortfolioMessage,
+  savePortfolioUser,
+  signInPortfolioAuthUser,
   updatePortfolioMessage,
 };

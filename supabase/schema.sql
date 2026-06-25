@@ -25,3 +25,20 @@ alter table public.portfolio_messages enable row level security;
 revoke all on table public.portfolio_messages from anon, authenticated;
 grant select, insert, update, delete on table public.portfolio_messages to service_role;
 
+create table if not exists public.portfolio_users (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(name) between 1 and 120),
+  email text not null unique check (char_length(email) between 3 and 320),
+  password_hash text not null,
+  role text not null default 'member' check (role in ('member', 'admin')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists portfolio_users_email_idx
+  on public.portfolio_users (email);
+
+alter table public.portfolio_users enable row level security;
+
+revoke all on table public.portfolio_users from anon, authenticated;
+grant select, insert, update, delete on table public.portfolio_users to service_role;

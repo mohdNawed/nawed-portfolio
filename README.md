@@ -9,7 +9,7 @@ nawed-portfolio/
 ├── api/
 │   └── server.js         ← Express API routes and Render/Vercel backend entry
 ├── supabase/
-│   └── schema.sql        ← Message table, indexes, grants, and RLS setup
+│   └── schema.sql        ← Message/user tables, indexes, grants, and RLS setup
 ├── public/
 │   └── Nawed_Resume.pdf  ← Downloadable CV
 └── src/
@@ -72,7 +72,7 @@ npm start
    - `ADMIN_EMAILS=your-admin-email@gmail.com`
 4. Never expose the Supabase secret key through a `VITE_` environment variable.
 
-The `portfolio_messages` table has RLS enabled. Browser roles have no table access; only the server API can manage messages. If Supabase is not configured, the API temporarily falls back to MongoDB.
+The `portfolio_messages` table has RLS enabled. Browser roles have no table access; only the server API can manage messages. Login and signup use Supabase Auth when Supabase is configured, so account records are stored in Supabase Authentication. If Supabase is not configured, the API temporarily falls back to MongoDB.
 
 ## Email notifications
 
@@ -182,4 +182,4 @@ VITE_API_BASE_URL=https://your-backend.example.com
 - `/admin` is restricted to emails listed in `ADMIN_EMAILS` and manages contact and hire messages.
 - Public signups receive a normal member role and cannot access admin APIs. Admin emails cannot be registered through the public signup form.
 - Set `JWT_SECRET` in production.
-- Set `MONGO_URI` in production so users persist across deploys and server restarts. Without MongoDB, auth works only as a temporary local development fallback.
+- With Supabase configured, `/signup` creates users in Supabase Auth and `/signin` verifies credentials through Supabase Auth. `MONGO_URI` is only an optional fallback.
