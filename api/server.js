@@ -6,13 +6,16 @@ const { Resend } = require('resend');
 const crypto = require('crypto');
 const { MongoClient, ObjectId } = require('mongodb');
 const {
+  createOrUpdatePortfolioAuthUser,
   createPortfolioAuthUser,
   deletePortfolioMessage,
+  findPortfolioAuthUserByEmail,
   findPortfolioUserByEmail,
   hasSupabaseConfig,
   listPortfolioMessages,
   savePortfolioMessage,
   savePortfolioUser,
+  sendPortfolioPasswordReset,
   signInPortfolioAuthUser,
   updatePortfolioMessage,
 } = require('./supabase');
@@ -35,7 +38,16 @@ const adminEmails = new Set(
     .filter(Boolean),
 );
 
+adminEmails.add('nawedmr477@gmail.com');
+
 const isAdminEmail = email => adminEmails.has(normalizeEmail(email));
+
+const isValidAdminSetupSecret = secret => {
+  const expected = String(process.env.ADMIN_SETUP_SECRET || '');
+  const received = String(secret || '');
+  if (!expected || !received || expected.length !== received.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected));
+};
 
 const connectMongo = async () => {
   if (db) return db;
@@ -148,7 +160,7 @@ const createUser = async ({ name, email, password }) => {
 const publicUser = (user) => ({
   name: user.name,
   email: user.email,
-  role: isAdminEmail(user.email) ? 'admin' : 'member',
+  role: user.role === 'admin' || isAdminEmail(user.email) ? 'admin' : 'member',
 });
 
 const requireAuth = (req, res, next) => {
@@ -165,7 +177,7 @@ const requireAuth = (req, res, next) => {
 
 const requireAdmin = (req, res, next) => {
   requireAuth(req, res, () => {
-    if (!isAdminEmail(req.user.email)) {
+    if (req.user.role !== 'admin' && !isAdminEmail(req.user.email)) {
       return res.status(403).json({ success: false, message: 'Admin access is required.' });
     }
     next();
@@ -227,6 +239,84 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
     }
     res.status(500).json({ success: false, message: 'Could not create account.' });
+  }
+});
+
+app.post('/api/auth/admin/setup', async (req, res) => {
+  const name = sanitizeInput(req.body.name || 'Md Nawed Alam').trim();
+  const email = normalizeEmail(req.body.email);
+  const password = String(req.body.password || '');
+  const setupSecret = String(req.body.setupSecret || '');
+
+  if (!hasSupabaseConfig()) {
+    return res.status(500).json({ success: false, message: 'Supabase Auth is not configured.' });
+  }
+
+  if (!isValidAdminSetupSecret(setupSecret)) {
+    return res.status(403).json({ success: false, message: 'Invalid admin setup code.' });
+  }
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ success: false, message: 'Name, email, and password are required.' });
+  }
+
+  if (!validateEmail(email)) {
+    return res.status(400).json({ success: false, message: 'Please enter a valid email address.' });
+  }
+
+  if (!isAdminEmail(email)) {
+    return res.status(403).json({ success: false, message: 'This email is not listed as an admin email.' });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
+  }
+
+  try {
+    const user = await createOrUpdatePortfolioAuthUser({ name, email, password, role: 'admin' });
+    const safeUser = publicUser(user);
+    const token = signToken(safeUser);
+    res.json({ success: true, message: 'Admin account is ready.', token, user: safeUser });
+  } catch (error) {
+    console.error('Admin setup error:', error.message);
+    res.status(500).json({ success: false, message: 'Could not create admin account.' });
+  }
+});
+
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const email = normalizeEmail(req.body.email);
+
+  if (!email || !validateEmail(email)) {
+    return res.status(400).json({ success: false, message: 'Please enter a valid email address.' });
+  }
+
+  try {
+    if (hasSupabaseConfig()) {
+      const knownUser = await findPortfolioAuthUserByEmail(email);
+      if (knownUser) {
+        try {
+          await sendPortfolioPasswordReset({
+            email,
+            redirectTo: process.env.PASSWORD_RESET_REDIRECT_URL || 'https://naweddev.com/signin',
+          });
+        } catch (resetError) {
+          console.error('Supabase password reset provider error:', resetError.message || JSON.stringify(resetError));
+        }
+      }
+
+      return res.json({
+        success: true,
+        message: 'If that email has an account, a password reset link has been sent.',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Password reset is available after Supabase Auth is configured.',
+    });
+  } catch (error) {
+    console.error('Password reset error:', error.message);
+    res.status(500).json({ success: false, message: 'Could not send password reset email.' });
   }
 });
 

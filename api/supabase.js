@@ -158,7 +158,7 @@ const toAuthUser = (authUser) => authUser && ({
   id: authUser.id,
   name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Portfolio User',
   email: authUser.email,
-  role: 'member',
+  role: authUser.app_metadata?.role === 'admin' ? 'admin' : 'member',
   createdAt: authUser.created_at,
 });
 
@@ -177,6 +177,76 @@ const createPortfolioAuthUser = async ({ name, email, password }) => {
   return toAuthUser(data.user);
 };
 
+const listAllAuthUsers = async () => {
+  const client = getSupabase();
+  if (!client) return [];
+
+  const allUsers = [];
+  let page = 1;
+  const perPage = 100;
+
+  while (true) {
+    const { data, error } = await client.auth.admin.listUsers({ page, perPage });
+    if (error) throw error;
+
+    allUsers.push(...(data.users || []));
+    if (!data.users || data.users.length < perPage) break;
+    page += 1;
+  }
+
+  return allUsers;
+};
+
+const findPortfolioAuthUserByEmail = async (email) => {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const users = await listAllAuthUsers();
+  return toAuthUser(users.find(user => user.email?.toLowerCase() === normalizedEmail));
+};
+
+const createOrUpdatePortfolioAuthUser = async ({ name, email, password, role = 'member' }) => {
+  const client = getSupabase();
+  if (!client) return null;
+
+  const appMetadata = role === 'admin' ? { role: 'admin' } : { role: 'member' };
+  const existingUsers = await listAllAuthUsers();
+  const existingUser = existingUsers.find(user => user.email?.toLowerCase() === email.toLowerCase());
+
+  if (existingUser) {
+    const { data, error } = await client.auth.admin.updateUserById(existingUser.id, {
+      password,
+      email_confirm: true,
+      user_metadata: { name },
+      app_metadata: appMetadata,
+    });
+
+    if (error) throw error;
+    return toAuthUser(data.user);
+  }
+
+  const { data, error } = await client.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { name },
+    app_metadata: appMetadata,
+  });
+
+  if (error) throw error;
+  return toAuthUser(data.user);
+};
+
+const sendPortfolioPasswordReset = async ({ email, redirectTo }) => {
+  const client = getSupabase();
+  if (!client) return null;
+
+  const { data, error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo,
+  });
+
+  if (error) throw error;
+  return data;
+};
+
 const signInPortfolioAuthUser = async ({ email, password }) => {
   const client = getSupabase();
   if (!client) return null;
@@ -191,13 +261,16 @@ const signInPortfolioAuthUser = async ({ email, password }) => {
 };
 
 module.exports = {
+  createOrUpdatePortfolioAuthUser,
   createPortfolioAuthUser,
   deletePortfolioMessage,
+  findPortfolioAuthUserByEmail,
   findPortfolioUserByEmail,
   hasSupabaseConfig,
   listPortfolioMessages,
   savePortfolioMessage,
   savePortfolioUser,
+  sendPortfolioPasswordReset,
   signInPortfolioAuthUser,
   updatePortfolioMessage,
 };

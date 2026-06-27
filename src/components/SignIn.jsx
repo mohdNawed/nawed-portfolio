@@ -17,7 +17,9 @@ const inputStyle = {
 export default function SignIn() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [status, setStatus] = useState('idle');
+  const [resetStatus, setResetStatus] = useState('idle');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { saveSession } = useAuth();
@@ -47,6 +49,33 @@ export default function SignIn() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    setError('');
+    setNotice('');
+
+    if (!form.email) {
+      setError('Enter your email first, then click forgot password.');
+      return;
+    }
+
+    setResetStatus('loading');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || 'Could not send reset link.');
+      setNotice(data.message);
+    } catch (err) {
+      setError(err.message || 'Could not send reset link.');
+    } finally {
+      setResetStatus('idle');
+    }
+  };
+
   return (
     <AuthLayout
       eyebrow="Welcome Back"
@@ -70,7 +99,21 @@ export default function SignIn() {
           <input name="password" type="password" required value={form.password} onChange={handleChange} placeholder="Your password" style={inputStyle} />
         </label>
 
+        <button type="button" onClick={handleForgotPassword} disabled={resetStatus === 'loading'} style={{
+          marginTop: '0.75rem',
+          padding: 0,
+          border: 'none',
+          background: 'transparent',
+          color: 'var(--accent)',
+          fontSize: '0.84rem',
+          fontWeight: 700,
+          cursor: resetStatus === 'loading' ? 'not-allowed' : 'pointer',
+        }}>
+          {resetStatus === 'loading' ? 'Sending reset link...' : 'Forgot password?'}
+        </button>
+
         {error && <p style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: '1rem' }}>{error}</p>}
+        {notice && <p style={{ color: '#047857', fontSize: '0.85rem', marginTop: '1rem' }}>{notice}</p>}
 
         <button type="submit" disabled={status === 'loading'} style={{
           width: '100%',
