@@ -75,14 +75,12 @@ const savePortfolioMessage = async (type, message) => {
   const client = getSupabase();
   if (!client) return null;
 
-  const { data, error } = await client
+  const { error } = await client
     .from('portfolio_messages')
-    .insert(toDatabaseMessage(type, message))
-    .select()
-    .single();
+    .insert(toDatabaseMessage(type, message));
 
   if (error) throw error;
-  return data;
+  return true;
 };
 
 const listPortfolioMessages = async () => {

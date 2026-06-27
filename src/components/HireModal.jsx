@@ -18,12 +18,17 @@ export default function HireModal({ open, onClose }) {
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async () => {
-    if (!form.name.trim() || !form.email.trim()) {
-      setErrorMsg('Please enter your name and email.'); return;
+  const handleSubmit = async event => {
+    event.preventDefault();
+
+    if (!form.name.trim() || !form.email.trim() || !form.details.trim()) {
+      setErrorMsg('Please enter your name, email, and project details.');
+      return;
     }
+
     setErrorMsg('');
     setStatus('loading');
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/hire`, {
         method: 'POST',
@@ -31,16 +36,14 @@ export default function HireModal({ open, onClose }) {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (data.success) { setStatus('success'); }
-      else { setStatus('error'); setErrorMsg(data.message || 'Something went wrong.'); }
-    } catch {
-      // Fallback: open mailto if backend unreachable
-      const subject = encodeURIComponent('Hire Inquiry: ' + (form.projectType || 'Project'));
-      const body = encodeURIComponent(
-        `Hi Nawed,\n\nName: ${form.name}\nEmail: ${form.email}\nProject: ${form.projectType}\nBudget: ${form.budget}\n\nDetails:\n${form.details}`
-      );
-      window.location.href = `mailto:mdalamnawed@gmail.com?subject=${subject}&body=${body}`;
+      if (!res.ok || !data.success) throw new Error(data.message || 'Something went wrong.');
+
       setStatus('success');
+      setForm({ name: '', email: '', projectType: '', budget: '', details: '' });
+    } catch (error) {
+      // Fallback: open mailto if backend unreachable
+      setStatus('error');
+      setErrorMsg(error.message || 'Could not send your inquiry. Please try again.');
     }
   };
 
@@ -63,6 +66,7 @@ export default function HireModal({ open, onClose }) {
       <div style={{
         background: 'white', borderRadius: 20, padding: '2.5rem',
         width: '100%', maxWidth: 480, position: 'relative',
+        maxHeight: '92vh', overflowY: 'auto',
         animation: 'slideUp 0.3s ease'
       }}>
         <style>{`@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}`}</style>
@@ -87,7 +91,7 @@ export default function HireModal({ open, onClose }) {
             }}>Close</button>
           </div>
         ) : (
-          <>
+          <form onSubmit={handleSubmit}>
             <h2 style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.4rem' }}>
               Let's Work Together 🚀
             </h2>
@@ -98,14 +102,14 @@ export default function HireModal({ open, onClose }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div>
                 <label style={labelStyle}>Your Name</label>
-                <input name="name" value={form.name} onChange={handleChange}
+                <input name="name" value={form.name} onChange={handleChange} required
                   placeholder="John Doe" style={inputStyle}
                   onFocus={e => e.target.style.borderColor = 'var(--accent)'}
                   onBlur={e => e.target.style.borderColor = 'var(--gray-200)'} />
               </div>
               <div>
                 <label style={labelStyle}>Your Email</label>
-                <input name="email" type="email" value={form.email} onChange={handleChange}
+                <input name="email" type="email" value={form.email} onChange={handleChange} required
                   placeholder="you@example.com" style={inputStyle}
                   onFocus={e => e.target.style.borderColor = 'var(--accent)'}
                   onBlur={e => e.target.style.borderColor = 'var(--gray-200)'} />
@@ -133,6 +137,7 @@ export default function HireModal({ open, onClose }) {
 
             <label style={labelStyle}>Project Details</label>
             <textarea name="details" value={form.details} onChange={handleChange}
+              required
               placeholder="Tell me about your project, timeline, and requirements..."
               style={{ ...inputStyle, resize: 'vertical', minHeight: 90 }}
               onFocus={e => e.target.style.borderColor = 'var(--accent)'}
@@ -140,7 +145,7 @@ export default function HireModal({ open, onClose }) {
 
             {errorMsg && <p style={{ color: '#e24b4a', fontSize: '0.82rem', marginBottom: '0.75rem' }}>{errorMsg}</p>}
 
-            <button onClick={handleSubmit} disabled={status === 'loading'} style={{
+            <button type="submit" disabled={status === 'loading'} style={{
               width: '100%', padding: '0.8rem',
               background: status === 'loading' ? 'var(--gray-400)' : 'var(--black)',
               color: 'white', border: 'none', borderRadius: 100,
@@ -152,7 +157,7 @@ export default function HireModal({ open, onClose }) {
             >
               {status === 'loading' ? '⏳ Sending...' : '✉ Send Inquiry'}
             </button>
-          </>
+          </form>
         )}
       </div>
     </div>

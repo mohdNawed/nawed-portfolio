@@ -23,7 +23,16 @@ create index if not exists portfolio_messages_status_idx
 alter table public.portfolio_messages enable row level security;
 
 revoke all on table public.portfolio_messages from anon, authenticated;
+grant usage on schema public to service_role;
 grant select, insert, update, delete on table public.portfolio_messages to service_role;
+
+drop policy if exists "service role manages portfolio messages" on public.portfolio_messages;
+create policy "service role manages portfolio messages"
+  on public.portfolio_messages
+  for all
+  to service_role
+  using (true)
+  with check (true);
 
 create table if not exists public.portfolio_users (
   id uuid primary key default gen_random_uuid(),
@@ -42,3 +51,11 @@ alter table public.portfolio_users enable row level security;
 
 revoke all on table public.portfolio_users from anon, authenticated;
 grant select, insert, update, delete on table public.portfolio_users to service_role;
+
+drop policy if exists "service role manages portfolio users" on public.portfolio_users;
+create policy "service role manages portfolio users"
+  on public.portfolio_users
+  for all
+  to service_role
+  using (true)
+  with check (true);
