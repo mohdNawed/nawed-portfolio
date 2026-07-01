@@ -6,27 +6,51 @@ A full-stack personal portfolio for Md Nawed Alam, Full Stack Developer.
 
 ```
 nawed-portfolio/
+├── frontend/
+│   ├── README.md         ← Frontend package notes
+│   └── package.json      ← Frontend convenience scripts
 ├── api/
 │   └── server.js         ← Express API routes and Render/Vercel backend entry
+├── backend/
+│   ├── models/           ← User, Project, Skill, Contact, Blog domain models
+│   ├── routes/           ← Auth, project, skill, contact, blog route groups
+│   ├── controllers/      ← Feature controller notes and ownership boundaries
+│   ├── middleware/       ← Auth helpers
+│   ├── config/           ← Database status/config helpers
+│   ├── server.js         ← Optional long-running Express entry for Render/Node hosts
+│   └── package.json
 ├── supabase/
 │   └── schema.sql        ← Message/user tables, indexes, grants, and RLS setup
 ├── public/
 │   └── Nawed_Resume.pdf  ← Downloadable CV
 └── src/
+    ├── pages/
+    │   ├── Home.jsx
+    │   ├── About.jsx
+    │   ├── Skills.jsx
+    │   ├── Projects.jsx
+    │   ├── Contact.jsx
+    │   └── Resume.jsx
+    ├── admin/
+    │   ├── Login.jsx
+    │   ├── Dashboard.jsx
+    │   └── ManageProjects.jsx
+    ├── api/
+    │   └── axios.js      ← Frontend API request helper
     ├── components/
-    │   ├── Navbar.js
-    │   ├── Hero.js       ← Photo embedded as base64
-    │   ├── Stats.js
-    │   ├── Projects.js   ← 12 projects with filter tabs
-    │   ├── Services.js
-    │   ├── Skills.js
-    │   ├── HireModal.js  ← POST to /api/hire
-    │   ├── Contact.js    ← POST to /api/contact
-    │   └── Footer.js
+    │   ├── Navbar.jsx
+    │   ├── Footer.jsx
+    │   ├── ProjectCard.jsx
+    │   ├── SkillCard.jsx
+    │   ├── HireModal.jsx ← POST to /api/hire
+    │   └── Contact.jsx   ← POST to /api/contact
     ├── data/
     │   └── projects.js   ← All project + skill data
-    └── App.js
+    ├── App.jsx
+    └── index.jsx
 ```
+
+The Vercel deployment still uses `api/server.js` as the serverless entrypoint and `src/` as the Vite frontend source so the live site remains stable. The added `backend/` folder gives the project the requested MVC-style organization for future route/controller/model growth without breaking production.
 
 ## Setup & Run
 

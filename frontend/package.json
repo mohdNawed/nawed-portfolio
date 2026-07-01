@@ -1,0 +1,9 @@
+{
+  "name": "nawed-portfolio-frontend",
+  "private": true,
+  "scripts": {
+    "dev": "cd .. && npm run dev",
+    "build": "cd .. && npm run build",
+    "preview": "cd .. && npm run preview"
+  }
+}
