@@ -23,40 +23,54 @@ export default function Home({ onHireClick }) {
       <SocialMedia />
 
       <section style={{
-        background: 'var(--black)',
+        background: 'var(--gradient-primary)',
         color: 'white',
         padding: '5rem 2rem',
         textAlign: 'center',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        <h2 style={{
-          fontFamily: 'Space Grotesk,sans-serif',
-          fontWeight: 800,
-          fontSize: 'clamp(1.8rem,3.5vw,2.5rem)',
-          marginBottom: '1rem',
-        }}>
-          Let's build something great together.
-        </h2>
-        <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 480, margin: '0 auto 2rem', lineHeight: 1.75 }}>
-          I'm actively looking for freelance work and full-time opportunities. Let's connect!
-        </p>
-        <button
-          onClick={onHireClick}
-          style={{
-            background: 'white',
-            color: 'var(--black)',
-            padding: '0.8rem 2rem',
-            borderRadius: 100,
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={event => { event.target.style.background = 'var(--accent)'; event.target.style.color = 'white'; }}
-          onMouseLeave={event => { event.target.style.background = 'white'; event.target.style.color = 'var(--black)'; }}
-        >
-          ✉ Get in Touch
-        </button>
+        <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
+          <div style={{
+            color: 'rgba(255,255,255,0.78)',
+            fontFamily: 'JetBrains Mono,monospace',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            marginBottom: '0.85rem',
+          }}>
+            Available for opportunities
+          </div>
+          <h2 style={{
+            fontFamily: 'Space Grotesk,sans-serif',
+            fontWeight: 800,
+            fontSize: 'clamp(1.8rem,3.5vw,2.65rem)',
+            marginBottom: '1rem',
+            letterSpacing: 0,
+          }}>
+            Let&apos;s build something useful, modern, and memorable.
+          </h2>
+          <p style={{ color: 'rgba(255,255,255,0.78)', maxWidth: 560, margin: '0 auto 2rem', lineHeight: 1.75 }}>
+            I&apos;m ready for fresher roles, internships, freelance work, and teams that value fast learning plus real ownership.
+          </p>
+          <button
+            onClick={onHireClick}
+            style={{
+              background: 'white',
+              color: 'var(--accent)',
+              padding: '0.85rem 2rem',
+              borderRadius: 100,
+              fontSize: '0.9rem',
+              fontWeight: 800,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 18px 36px rgba(15,23,42,0.22)',
+            }}
+          >
+            Get in Touch
+          </button>
+        </div>
       </section>
 
       <Contact onHireClick={onHireClick} />

@@ -33,7 +33,7 @@ export default function Contact({ onHireClick }) {
   };
 
   return (
-    <section id="contact" style={{ padding: '5rem 2rem', background: 'var(--off-white)' }}>
+    <section id="contact" style={{ padding: '5rem 2rem', background: 'linear-gradient(135deg, rgba(255,248,241,0.95), rgba(224,242,254,0.85))' }}>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <div className="section-eyebrow">Get In Touch</div>
@@ -57,9 +57,10 @@ export default function Contact({ onHireClick }) {
             ['Location', 'New Delhi, India', null],
           ].map(([label, value, href]) => (
             <div key={label} style={{
-              background: 'white',
-              border: '1px solid var(--gray-200)',
+              background: 'rgba(255,255,255,0.88)',
+              border: '1px solid rgba(124,58,237,0.12)',
               borderRadius: 'var(--radius-sm)',
+              boxShadow: '0 12px 30px rgba(15,23,42,0.06)',
               padding: '0.85rem 1rem',
             }}>
               <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{label}</span>
@@ -75,7 +76,7 @@ export default function Contact({ onHireClick }) {
         </div>
 
         {status === 'success' ? (
-          <div style={{ textAlign: 'center', padding: '2rem', background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)' }}>
+          <div style={{ textAlign: 'center', padding: '2rem', background: 'rgba(255,255,255,0.9)', borderRadius: 'var(--radius)', border: '1px solid rgba(124,58,237,0.12)', boxShadow: 'var(--shadow-soft)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
             <h3 style={{ fontFamily: 'Space Grotesk,sans-serif', fontWeight: 700 }}>Message Sent!</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.5rem' }}>I'll get back to you within 24 hours.</p>
@@ -86,8 +87,8 @@ export default function Contact({ onHireClick }) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{
-            background: 'white', borderRadius: 'var(--radius)',
-            border: '1px solid var(--gray-200)', padding: '2rem'
+            background: 'rgba(255,255,255,0.9)', borderRadius: 'var(--radius)',
+            border: '1px solid rgba(124,58,237,0.12)', padding: '2rem', boxShadow: 'var(--shadow-soft)', backdropFilter: 'blur(12px)'
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div>
@@ -116,15 +117,15 @@ export default function Contact({ onHireClick }) {
             )}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <button type="submit" disabled={status === 'loading'} style={{
-                flex: 1, padding: '0.8rem', background: 'var(--black)', color: 'white',
+                flex: 1, padding: '0.8rem', background: 'var(--gradient-primary)', color: 'white',
                 border: 'none', borderRadius: 100, fontSize: '0.9rem', fontWeight: 600,
                 cursor: status === 'loading' ? 'not-allowed' : 'pointer', transition: 'background 0.2s'
               }}
                 onMouseEnter={e => { if (status !== 'loading') e.target.style.background = 'var(--accent)'; }}
-                onMouseLeave={e => { if (status !== 'loading') e.target.style.background = 'var(--black)'; }}
+                onMouseLeave={e => { if (status !== 'loading') e.target.style.background = 'var(--gradient-primary)'; }}
               >{status === 'loading' ? '⏳ Sending...' : '✉ Send Message'}</button>
               <button type="button" onClick={onHireClick} style={{
-                padding: '0.8rem 1.5rem', background: 'var(--accent-light)', color: 'var(--accent)',
+                padding: '0.8rem 1.5rem', background: 'linear-gradient(135deg, rgba(244,63,94,0.12), rgba(249,115,22,0.14))', color: 'var(--rose)',
                 border: '1.5px solid var(--accent)', borderRadius: 100, fontSize: '0.9rem',
                 fontWeight: 600, cursor: 'pointer'
               }}>🚀 Full Hire Form</button>
@@ -140,3 +141,5 @@ export default function Contact({ onHireClick }) {
     </section>
   );
 }
+
+

@@ -6,12 +6,13 @@ export default function ProjectCard({ project, active, onMouseEnter, onMouseLeav
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
-        background: 'white',
+        background: 'rgba(255,255,255,0.9)',
         borderRadius: 'var(--radius)',
         overflow: 'hidden',
-        border: '1px solid var(--gray-200)',
-        transform: active ? 'translateY(-6px)' : 'none',
-        boxShadow: active ? '0 16px 40px rgba(0,0,0,0.1)' : 'none',
+        border: active ? '1px solid rgba(124,58,237,0.28)' : '1px solid rgba(255,255,255,0.72)',
+        transform: active ? 'translateY(-7px)' : 'none',
+        boxShadow: active ? 'var(--shadow-color)' : '0 12px 32px rgba(15,23,42,0.08)',
+        backdropFilter: 'blur(12px)',
         transition: 'all 0.25s ease',
       }}
     >
@@ -29,7 +30,7 @@ export default function ProjectCard({ project, active, onMouseEnter, onMouseLeav
           position: 'absolute',
           top: 12,
           right: 12,
-          background: 'rgba(255,255,255,0.2)',
+          background: 'rgba(255,255,255,0.28)',
           backdropFilter: 'blur(8px)',
           color: 'white',
           fontSize: '0.65rem',
@@ -46,10 +47,10 @@ export default function ProjectCard({ project, active, onMouseEnter, onMouseLeav
       <div style={{ padding: '1.25rem' }}>
         <div style={{
           fontSize: '0.7rem',
-          fontWeight: 600,
+          fontWeight: 700,
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color: 'var(--text-muted)',
+          color: 'var(--accent)',
           marginBottom: '0.4rem',
         }}>
           {project.category}
@@ -59,6 +60,7 @@ export default function ProjectCard({ project, active, onMouseEnter, onMouseLeav
           fontSize: '1.05rem',
           fontWeight: 700,
           marginBottom: '0.5rem',
+          color: 'var(--black)',
         }}>
           {project.title}
         </h3>
@@ -79,7 +81,7 @@ export default function ProjectCard({ project, active, onMouseEnter, onMouseLeav
           }}>
             {project.features.map(feature => (
               <li key={feature} style={{ display: 'flex', gap: '0.45rem' }}>
-                <span style={{ color: 'var(--accent)', fontWeight: 800 }}>✓</span>
+                <span style={{ color: 'var(--emerald)', fontWeight: 800 }}>✓</span>
                 <span>{feature}</span>
               </li>
             ))}
@@ -89,11 +91,12 @@ export default function ProjectCard({ project, active, onMouseEnter, onMouseLeav
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
           {project.tech.map(tech => (
             <span key={tech} style={{
-              background: 'var(--gray-100)',
+              background: 'linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.1))',
+              border: '1px solid rgba(124,58,237,0.12)',
               borderRadius: 100,
               padding: '2px 10px',
               fontSize: '0.72rem',
-              fontWeight: 500,
+              fontWeight: 600,
               color: 'var(--gray-800)',
             }}>
               {tech}
@@ -104,24 +107,24 @@ export default function ProjectCard({ project, active, onMouseEnter, onMouseLeav
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <a href={project.github} target="_blank" rel="noreferrer" style={{
             fontSize: '0.8rem',
-            fontWeight: 600,
+            fontWeight: 700,
             color: 'var(--accent)',
             display: 'flex',
             alignItems: 'center',
             gap: 4,
           }}>
-            ⬡ GitHub
+            GitHub
           </a>
           {project.live !== '#' && (
             <a href={project.live} target="_blank" rel="noreferrer" style={{
               fontSize: '0.8rem',
-              fontWeight: 600,
-              color: 'var(--gray-600)',
+              fontWeight: 700,
+              color: 'var(--cyan)',
               display: 'flex',
               alignItems: 'center',
               gap: 4,
             }}>
-              ↗ Live Demo
+              Live Demo
             </a>
           )}
         </div>

@@ -30,7 +30,7 @@ const strengths = [
 
 export default function About({ onHireClick }) {
   return (
-    <section id="about" style={{ padding: '5rem 2rem', background: 'white' }}>
+    <section id="about" style={{ padding: '5rem 2rem', background: 'linear-gradient(180deg, rgba(255,255,255,0.9), rgba(243,232,255,0.45))' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div className="about-intro">
           <div>
@@ -62,7 +62,7 @@ export default function About({ onHireClick }) {
 
         <div className="about-body">
           <div style={{
-            background: 'var(--black)',
+            background: 'var(--gradient-primary)',
             color: 'white',
             padding: '2rem',
             borderRadius: 'var(--radius)',
@@ -262,3 +262,5 @@ export default function About({ onHireClick }) {
     </section>
   );
 }
+
+
